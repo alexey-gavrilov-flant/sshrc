@@ -25,6 +25,9 @@ alias dig='dig +noall +answer'
 alias bc='bc -l'
 alias ssh='sshrc'
 complete -o default -F __start_kubectl k
+
+alias k="sudo kubectl --kubeconfig=/root/.kube/config"
+alias kubectl="sudo kubectl --kubeconfig=/root/.kube/config"
 alias linstor='kubectl exec -n d8-linstor deploy/linstor-controller -- linstor'
 alias k.get.events="kubectl get events --sort-by=.metadata.creationTimestamp"
 alias k.get.pod="kubectl get pods -A -o wide"
