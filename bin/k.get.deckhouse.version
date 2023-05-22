@@ -1,0 +1,1 @@
+jq -s add <(kubectl -n d8-system get deployment deckhouse -o json | jq -r '.metadata.annotations | {"core.deckhouse.io/edition","core.deckhouse.io/version"}') <(kubectl -n d8-system get deployment deckhouse -o json | jq -r '.spec.template.spec.containers[] | {image}') <(kubectl get mc deckhouse  -o json | jq -r '.spec.settings | {releaseChannel,update}')
