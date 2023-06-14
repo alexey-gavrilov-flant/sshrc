@@ -12,31 +12,42 @@ fi
 
 HISTCONTROL=ignoreboth
 shopt -s histappend
-HISTSIZE=1000
-HISTFILESIZE=2000
+HISTSIZE=30000
+HISTFILESIZE=40000
 
-if [ -f /etc/bash_completion ] && ! shopt -oq posix; then . /etc/bash_completion ; fi
-export PATH=$SSHHOME:$SSHHOME/bin:$PATH:~/bin
+if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
+  . /etc/bash_completion
+  complete -o default -F __start_kubectl k
+fi
+export PATH=$SSHHOME:$SSHHOME/bin:/opt/deckhouse/bin/:$PATH:~/bin
 #alias
 export VIMINIT="let \$MYVIMRC='$SSHHOME/.vimrc' | source \$MYVIMRC"
 alias mc='mc -b'
-alias gitadd='git add . && git commit -m "item $RANDOM" && git push origin HEAD'
+alias gitadd='git add . && git commit -s -m "item $RANDOM" && git push origin HEAD'
 alias dig='dig +noall +answer'
 alias bc='bc -l'
 alias ssh='sshrc'
-complete -o default -F __start_kubectl k
 
-alias k="sudo kubectl --kubeconfig=/root/.kube/config"
-alias kubectl="sudo kubectl --kubeconfig=/root/.kube/config"
+if [ -f /opt/deckhouse/bin/kubectl ]; then
+  alias k="sudo /opt/deckhouse/bin/kubectl --kubeconfig=/root/.kube/config"
+  alias kubectl="sudo /opt/deckhouse/bin/kubectl --kubeconfig=/root/.kube/config"
+else
+  alias k="sudo kubectl --kubeconfig=/root/.kube/config"
+  alias kubectl="sudo kubectl --kubeconfig=/root/.kube/config"
+fi
+
 alias linstor='kubectl exec -n d8-linstor deploy/linstor-controller -- linstor'
 alias k.get.events="kubectl get events --sort-by=.metadata.creationTimestamp"
 alias k.get.pod="kubectl get pods -A -o wide"
-alias k.get.pod.bad="kubectl get pods -A -o wide | grep -v Running | grep -v Completed"
+alias k.get.pod.bad="kubectl get pods -A -o wide | awk 'split(\$3, arr, \"/\") && (arr[1] != arr[2]) {print \$0}' | grep -v Completed"
 alias k.get.nodes="kubectl get nodes -o wide"
-alias k.get.grafana="kubectl -n d8-monitoring get ing grafana -ojson | jq -r .spec.rules[0].host"
+alias k.get.ng.bad="k get ng | awk '(\$4 != \$5) {print \$0}'"
+alias k.get.grafana="kubectl -n d8-monitoring get ing grafana -ojson | jq -r .spec.rules[0].host | awk '{print \"echo \" \$1 \"; dig +noall +answer \" \$1 }' | bash"
 alias k.get.limit="kubectl -n d8-monitoring exec -it prometheus-main-0 -- curl localhost:9090/api/v1/targets | jq -r '.data.activeTargets[] | select(.lastError==\"sample limit exceeded\") | {labels,scrapeUrl}'"
 
 alias k.get.machine="kubectl get machine -A"
 alias k.get.machine.bad="kubectl get machine -A | grep -v Running"
 alias k.get.deckhouse.queue.main="kubectl -n d8-system exec -i deploy/deckhouse -- deckhouse-controller queue main"
 alias k.get.deckhouse.queue.list="kubectl -n d8-system exec -i deploy/deckhouse -- deckhouse-controller queue list"
+alias k.get.metrics.https="TOKEN=\$(k -n d8-monitoring get secrets prometheus-token -ojsonpath='{.data.token}' | base64 -d) && curl -H \"Authorization: Bearer \${TOKEN}\" -k"
+alias k.get.dns="echo certSANs && k get mc control-plane-manager -ojsonpath='{.spec.settings.apiserver.certSANs}' | jq . && echo clusterDomainAliases && k get mc kube-dns -ojsonpath='{.spec.settings.clusterDomainAliases}' | jq . && k -n kube-system get secrets d8-cluster-configuration -ojsonpath='{.data.cluster-configuration\.yaml}' | base64 -d | grep clusterDomain && k -n kube-system get pod -l k8s-app=kube-dns -ojson | jq -r '.items[].status.podIP | \"dig -p 5353 @\"+.'"
