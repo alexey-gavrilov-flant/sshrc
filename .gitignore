@@ -1,2 +1,3 @@
 *.swp
 bin/k.add.user
+/bin/k.add.nodeuser

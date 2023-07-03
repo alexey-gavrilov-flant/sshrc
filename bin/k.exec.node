@@ -1,0 +1,1 @@
+kubectl debug node/$@ -it --image=busybox -- chroot /host/

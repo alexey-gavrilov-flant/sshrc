@@ -1,0 +1,17 @@
+cat << EOF | kubectl create -f -
+apiVersion: deckhouse.io/v1alpha1
+kind: NodeGroupConfiguration
+metadata:
+  name: prune-containerd-content.sh
+spec:
+  weight: 100
+  bundles:
+  - "*"
+  nodeGroups:
+  - "*"
+  content: |
+    {{- if eq .cri "Containerd" }}
+    ctr -n k8s.io content prune references
+    {{- end }}
+EOF
+
