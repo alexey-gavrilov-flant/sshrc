@@ -36,10 +36,10 @@ else
   alias kubectl="sudo kubectl --kubeconfig=/root/.kube/config"
 fi
 
-alias linstor='kubectl exec -n d8-linstor deploy/linstor-controller -- linstor'
 alias k.get.events="kubectl get events --sort-by=.metadata.creationTimestamp"
 alias k.get.pod="kubectl get pods -A -o wide"
 alias k.get.pod.bad="kubectl get pods -A -o wide | awk 'split(\$3, arr, \"/\") && (arr[1] != arr[2]) {print \$0}' | grep -v Completed"
+alias k.get.pod.bad.d8="kubectl get pods -A -o wide | awk 'split(\$3, arr, \"/\") && (arr[1] != arr[2]) {print \$0}' | grep -E \"(d8-|kube-system)\""
 alias k.get.nodes="kubectl get nodes -o wide"
 alias k.get.ng.bad="k get ng | awk '(\$4 != \$5) {print \$0}'"
 alias k.get.grafana="kubectl -n d8-monitoring get ing grafana -ojson | jq -r .spec.rules[0].host | awk '{print \"echo \" \$1 \"; dig +noall +answer \" \$1 }' | bash"
