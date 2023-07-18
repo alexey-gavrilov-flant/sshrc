@@ -46,12 +46,14 @@ alias k.get.grafana="kubectl -n d8-monitoring get ing grafana -ojson | jq -r .sp
 alias k.get.limit="kubectl -n d8-monitoring exec -it prometheus-main-0 -- curl localhost:9090/api/v1/targets | jq -r '.data.activeTargets[] | select(.lastError==\"sample limit exceeded\") | {labels,scrapeUrl}'"
 
 alias k.get.machine="kubectl get machine -A"
+alias k.get.etcd="kubectl -n kube-system exec -ti `kubectl -n kube-system get pod -l component=etcd,tier=control-plane -o json | jq -r '.items[] | select( .status.conditions[] | select(.type == \"ContainersReady\" and .status == \"True\")) | .metadata.name' | head -n1` -- sh -c 'ETCDCTL_API=3 etcdctl --cacert /etc/kubernetes/pki/etcd/ca.crt --cert /etc/kubernetes/pki/etcd/ca.crt --key /etc/kubernetes/pki/etcd/ca.key --endpoints https://127.0.0.1:2379/ member list -w table'"
 alias k.get.machine.bad="kubectl get machine -A | grep -v Running"
 alias k.get.clusteralerts="kubectl get clusteralerts"
 alias k.dhctl.terraform.check="kubectl -n d8-system exec -ti deploy/terraform-auto-converger -- dhctl terraform check --kube-client-from-cluster"
 alias k.dhctl.converge="kubectl -n d8-system exec -ti deploy/terraform-auto-converger -- dhctl converge"
 alias k.dhctl.get.cluster-configuration="kubectl -n kube-system get secrets d8-cluster-configuration  -o jsonpath='{.data.cluster-configuration\\.yaml}' | base64 -d"
 alias k.dhctl.edit.cluster-configuration="kubectl -n d8-system exec -ti deploy/terraform-auto-converger -- dhctl config edit cluster-configuration --kube-client-from-cluster"
+alias k.dhctl.get.static-cluster-configuration="kubectl -n kube-system get secrets d8-static-cluster-configuration -o jsonpath='{.data.static-cluster-configuration\\.yaml}' | base64 -d"
 alias k.dhctl.get.provider-cluster-configuration="kubectl -n kube-system get secrets d8-provider-cluster-configuration -o jsonpath='{.data.cloud-provider-cluster-configuration\\.yaml}' | base64 -d"
 alias k.dhctl.edit.provider-cluster-configuration="kubectl -n d8-system exec -ti deploy/terraform-auto-converger -- dhctl config edit provider-cluster-configuration --kube-client-from-cluster"
 
