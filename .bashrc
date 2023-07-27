@@ -7,7 +7,7 @@ else
     PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[01;34m\] \w \$\[\033[00m\] '
 fi
 if [[ $CLIENT != "" ]]; then
-  PS1="\[\][$CLIENT]\[\] $PS1"
+  PS1="\[\][$CLIENT]\[\]\[\033[01;33m\][\$(date +%H:%M:%S -u)]$PS1"
 fi
 
 HISTCONTROL=ignoreboth
@@ -39,14 +39,13 @@ fi
 alias k.get.events="kubectl get events --sort-by=.metadata.creationTimestamp"
 alias k.get.pod="kubectl get pods -A -o wide"
 alias k.get.pod.bad="kubectl get pods -A -o wide | awk 'split(\$3, arr, \"/\") && (arr[1] != arr[2]) {print \$0}' | grep -v Completed"
-alias k.get.pod.bad.d8="kubectl get pods -A -o wide | awk 'split(\$3, arr, \"/\") && (arr[1] != arr[2]) {print \$0}' | grep -E \"(d8-|kube-system)\""
+alias k.get.pod.bad.d8="kubectl get pods -A -o wide | awk 'split(\$3, arr, \"/\") && (arr[1] != arr[2]) {print \$0}' | grep -E \"^(d8-|kube-system)\""
 alias k.get.nodes="kubectl get nodes -o wide"
 alias k.get.ng.bad="k get ng | awk '(\$4 != \$5) {print \$0}'"
 alias k.get.grafana="kubectl -n d8-monitoring get ing grafana -ojson | jq -r .spec.rules[0].host | awk '{print \"echo \" \$1 \"; dig +noall +answer \" \$1 }' | bash"
 alias k.get.limit="kubectl -n d8-monitoring exec -it prometheus-main-0 -- curl localhost:9090/api/v1/targets | jq -r '.data.activeTargets[] | select(.lastError==\"sample limit exceeded\") | {labels,scrapeUrl}'"
 
 alias k.get.machine="kubectl get machine -A"
-alias k.get.etcd="kubectl -n kube-system exec -ti `kubectl -n kube-system get pod -l component=etcd,tier=control-plane -o json | jq -r '.items[] | select( .status.conditions[] | select(.type == \"ContainersReady\" and .status == \"True\")) | .metadata.name' | head -n1` -- sh -c 'ETCDCTL_API=3 etcdctl --cacert /etc/kubernetes/pki/etcd/ca.crt --cert /etc/kubernetes/pki/etcd/ca.crt --key /etc/kubernetes/pki/etcd/ca.key --endpoints https://127.0.0.1:2379/ member list -w table'"
 alias k.get.machine.bad="kubectl get machine -A | grep -v Running"
 alias k.get.clusteralerts="kubectl get clusteralerts"
 alias k.dhctl.terraform.check="kubectl -n d8-system exec -ti deploy/terraform-auto-converger -- dhctl terraform check --kube-client-from-cluster"

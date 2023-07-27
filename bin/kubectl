@@ -1,5 +1,1 @@
-if [ -f /opt/deckhouse/bin/kubectl ]; then
-  sudo /opt/deckhouse/bin/kubectl --kubeconfig=/root/.kube/config $@
-else
-  sudo kubectl --kubeconfig=/root/.kube/config $@
-fi
+sudo /opt/deckhouse/bin/kubectl --kubeconfig=/root/.kube/config "$@"
