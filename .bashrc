@@ -7,7 +7,11 @@ else
     PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[01;34m\] \w \$\[\033[00m\] '
 fi
 if [[ $CLIENT != "" ]]; then
-  PS1="\[\][$CLIENT]\[\]\[\033[01;33m\][\$(date +%H:%M:%S -u)]$PS1"
+  if [[ $TERM == "screen" ]]; then
+    PS1="\[\][$CLIENT]\[\]\[\033[01;33m\][\$(date +%H:%M:%S -u)]\[\033[01;31m\][screen]$PS1"
+  else
+    PS1="\[\][$CLIENT]\[\]\[\033[01;33m\][\$(date +%H:%M:%S -u)]$PS1"
+  fi
 fi
 
 HISTCONTROL=ignoreboth
