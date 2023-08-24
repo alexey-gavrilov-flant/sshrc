@@ -1,18 +1,10 @@
 if [[ $CLIENT == "" ]]; then
   CLIENT=`grep -oP "(?<=\[)[a-z]*(?=\])" ~/.bashrc`
 fi
-if [[ ${EUID} == 0 ]]; then
-    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;31m\]\u@\h\[\033[01;34m\] \w \$\[\033[00m\] '
-else
-    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[01;34m\] \w \$\[\033[00m\] '
-fi
-if [[ $CLIENT != "" ]]; then
-  if [[ $TERM == "screen" ]]; then
-    PS1="\[\][$CLIENT]\[\]\[\033[01;33m\][\$(date +%H:%M:%S -u)]\[\033[01;31m\][screen]$PS1"
-  else
-    PS1="\[\][$CLIENT]\[\]\[\033[01;33m\][\$(date +%H:%M:%S -u)]$PS1"
-  fi
-fi
+#PS1
+SCREEN="\[\033[01;31m\][ssh]"; if [[ $TERM == "screen" ]]; then SCREEN="[screen]"; fi
+USER_PS="\u"; if [[ ${EUID} == 0 ]]; then USER_PS="\[\033[01;31m\]\u"; fi
+PS1="\[\033[01;33m\][\$(date +%H:%M:%S -u)]$SCREEN\[\033[01;32m\][$USER_PS\[\033[01;32m\]@$CLIENT.\h]\[\033[01;34m\] \w \$\[\033[00m\] "
 
 HISTCONTROL=ignoreboth
 shopt -s histappend
