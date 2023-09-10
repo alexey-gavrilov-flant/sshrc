@@ -1,10 +1,11 @@
 if [[ $CLIENT == "" ]]; then
-  CLIENT=`grep -oP "(?<=\[)[a-z]*(?=\])" ~/.bashrc`
+  CLIENT=`grep -oP "(?<=\[)[a-z-]*(?=\])" ~/.bashrc`
 fi
 #PS1
 SCREEN="\[\033[01;31m\][ssh]"; if [[ $TERM == "screen" ]]; then SCREEN="[screen]"; fi
-USER_PS="\u"; if [[ ${EUID} == 0 ]]; then USER_PS="\[\033[01;31m\]\u"; fi
-PS1="\[\033[01;33m\][\$(date +%H:%M:%S -u)]$SCREEN\[\033[01;32m\][$USER_PS\[\033[01;32m\]@$CLIENT.\h]\[\033[01;34m\] \w \$\[\033[00m\] "
+USER_PS="\[\033[01;32m\][\u"; if [[ ${EUID} == 0 ]]; then USER_PS="\[\033[01;31m\][\u"; fi
+CLIENT_PS="$CLIENT."; if [[ $CLIENT == "" ]]; then CLIENT_PS=""; fi
+PS1="\[\033[01;33m\][\$(date +%H:%M:%S -u)]$SCREEN$USER_PS@$CLIENT_PS\h]\[\033[01;34m\] \w \$\[\033[00m\] "
 
 HISTCONTROL=ignoreboth
 shopt -s histappend
@@ -32,6 +33,7 @@ else
   alias kubectl="sudo kubectl --kubeconfig=/root/.kube/config"
 fi
 
+alias helm="sudo helm"
 alias k.get.events="kubectl get events --sort-by=.metadata.creationTimestamp"
 alias k.get.pod="kubectl get pods -A -o wide"
 #alias k.get.pod.bad="kubectl get pods -A -o wide | awk 'split(\$3, arr, \"/\") && (arr[1] != arr[2]) {print \$0}' | grep -v Completed"
