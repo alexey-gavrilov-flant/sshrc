@@ -1,6 +1,3 @@
-**sshrc was originally written by Russell Stewart (Russell91), who left GitHub,
-and hasn't responded to requests to appoint a new maintainer. This is a
-maintained continuation of his work.**
 
 ## Usage
 
