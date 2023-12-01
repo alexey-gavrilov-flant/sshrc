@@ -1,2 +1,2 @@
-kubectl debug node/$@ -it --image=busybox:stable -- chroot /host/
+kubectl debug node/$1 -it --image=busybox:stable -- chroot /host/ $2
 kubectl get pod -n default | grep $1 | awk '{print "kubectl delete pod -n default " $1}' | bash
