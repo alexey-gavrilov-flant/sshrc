@@ -1,0 +1,1 @@
+kubectl -n kube-system get secrets d8-cluster-configuration  -o jsonpath='{.data.cluster-configuration\.yaml}' | base64 -d

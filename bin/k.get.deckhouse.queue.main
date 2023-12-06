@@ -1,0 +1,1 @@
+kubectl -n d8-system exec -it deploy/deckhouse -- deckhouse-controller queue main

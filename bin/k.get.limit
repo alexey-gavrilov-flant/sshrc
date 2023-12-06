@@ -1,0 +1,1 @@
+kubectl -n d8-monitoring exec -it prometheus-main-0 -- curl localhost:9090/api/v1/targets | jq -r '.data.activeTargets[] | select(.lastError=="sample limit exceeded") | {labels,scrapeUrl}'

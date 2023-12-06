@@ -1,0 +1,5 @@
+echo certSANs
+k get mc control-plane-manager -ojsonpath='{.spec.settings.apiserver.certSANs}' | jq .
+echo clusterDomainAliases
+k get mc kube-dns -ojsonpath='{.spec.settings.clusterDomainAliases}' | jq .
+k -n kube-system get secrets d8-cluster-configuration -ojsonpath='{.data.cluster-configuration\.yaml}' | base64 -d | grep clusterDomain && k -n kube-system get pod -l k8s-app=kube-dns -ojson | jq -r '.items[].status.podIP | "dig - p 5353 @"+.'

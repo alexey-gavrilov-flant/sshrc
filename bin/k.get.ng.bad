@@ -1,0 +1,1 @@
+k get ng | awk '(\$4 != \$5) {print \$0}'
