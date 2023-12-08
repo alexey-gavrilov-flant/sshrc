@@ -1,1 +1,1 @@
-sudo helm
+sudo helm $@
