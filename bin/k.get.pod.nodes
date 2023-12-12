@@ -1,1 +1,1 @@
-k.get.pods --field-selector=spec.nodeName=$1
+k.get.pod --field-selector=spec.nodeName=$1
