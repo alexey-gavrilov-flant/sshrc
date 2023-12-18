@@ -1,1 +1,1 @@
-kubectl exec -n d8-linstor deploy/linstor-controller -- linstor $@
+kubectl exec -n d8-sds-drbd deploy/linstor-controller -- linstor $@
