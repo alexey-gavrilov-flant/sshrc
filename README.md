@@ -19,6 +19,10 @@ You can use this to set environment variables, define functions, and run post-lo
 #### Everything else
 
     git clone git@github.com:alexey-gavrilov-flant/sshrc.git ~/flant/sshrc &&
-    ls -n ~/flant/sshrc/sshrc ~/bin/sshrc
+    ln -s ~/flant/sshrc/sshrc ~/bin/sshrc
     echo "alias ssh='sshrc'" >> ~/.bash_aliases
 
+At MacOS you also need `base64` command from `coreutils` package
+
+    brew install coreutils &&
+    ln -s /opt/homebrew/opt/coreutils/libexec/gnubin/base64 ~/bin/base64
