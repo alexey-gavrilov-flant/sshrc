@@ -1,1 +1,2 @@
-cat /proc/$1/cgroup | awk -F/ '{print $5}' | xargs /opt/deckhouse/bin/crictl inspect --output go-template --template 'k -n {{ index .info.config.labels "io.kubernetes.pod.namespace"}} {{ index .info.config.labels "io.kubernetes.pod.name"}} -c {{ index .info.config.labels "io.kubernetes.container.name"}}'
+if [[ -z "$1" ]]; then echo "Please, provide pid"; exit 1; fi
+cat /proc/$1/cgroup | awk -F/ '{print $5}' | xargs crictl inspect --output go-template --template 'k -n {{ index .info.config.labels "io.kubernetes.pod.namespace"}} logs {{ index .info.config.labels "io.kubernetes.pod.name"}} -c {{ index .info.config.labels "io.kubernetes.container.name"}}'
