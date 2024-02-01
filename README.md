@@ -26,3 +26,9 @@ At MacOS you also need `base64` command from `coreutils` package
 
     brew install coreutils &&
     ln -s /opt/homebrew/opt/coreutils/libexec/gnubin/base64 ~/bin/base64
+
+## Useful pipelines
+
+Before D8 version `v1.55.0` it may help to solve D8NodeIsNotUpdating that caused by infinity timeout in apt-get
+
+    k.get.clusteralerts | grep D8NodeIsNotUpdating | awk '{ print "k.get.clusteralerts " $1 " -o yaml" }' | bash | grep 'node:' | awk '{ print "k.exec.node " $2 " \"systemctl restart apt-daily bashible\"" }' | bash
