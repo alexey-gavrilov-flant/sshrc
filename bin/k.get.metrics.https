@@ -1,2 +1,3 @@
+set -x
 TOKEN=$(k -n d8-monitoring get secrets prometheus-token -ojsonpath='{.data.token}' | base64 -d)
 curl -H "Authorization: Bearer ${TOKEN}" -k $@

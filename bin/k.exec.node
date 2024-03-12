@@ -1,2 +1,40 @@
-kubectl debug node/$1 -it --image=busybox:stable -- chroot /host/ $2
-kubectl get pod -n default | grep $1 | awk '{print "kubectl delete pod -n default " $1}' | bash
+if [ -t 0 ]; then
+  tty=true
+else
+  tty=false
+fi
+
+node=$1
+volumes='[{"hostPath":{"path":"/","type":""},"name":"host-root"}]'
+volume_mounts='[{"mountPath":"/host","name":"host-root"}]'
+cmd='["sh","-c","--"," chroot /host/ '$2'"]'
+overrides="$(
+cat <<EOF
+{
+  "spec": {
+    "nodeName": "$node",
+    "hostPID": true,
+    "hostNetwork": true,
+    "containers": [
+      {
+        "securityContext": { "privileged":true },
+        "image": "busybox:stable",
+        "name": "debug",
+        "stdin": true,
+        "stdinOnce": true,
+        "tty": $tty,
+        "command": $cmd,
+        "volumeMounts": $volume_mounts
+      }
+    ],
+    "tolerations": [
+      { "effect": "NoExecute", "operator": "Exists" }
+    ],
+    "volumes": $volumes
+  }
+}
+EOF
+)"
+
+kubectl delete pod $node --ignore-not-found=true
+kubectl run "$node" --image "busybox:stable" --restart=Never --rm --overrides="$overrides" --pod-running-timeout="1m" $([ "$tty" = true ] && echo -t) -i "debug"
