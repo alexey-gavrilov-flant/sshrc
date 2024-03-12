@@ -14,7 +14,7 @@ echo $(tar cfz - -h -C $SSHHOME $files | base64 -w0) | base64 -d | tar mxzf - -C
 export SSHHOME=\$SSHHOME
 export CLIENT=`echo $DOMAIN | awk -F. '{print $1}'`
 echo \"$CMDARG\" >> \$SSHHOME/.bashrc
-bash --rcfile \$SSHHOME/.bashrc
+exec bash --rcfile \$SSHHOME/.bashrc
 "
 }
 
