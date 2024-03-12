@@ -1,1 +1,1 @@
-sudo SSHHOME=$SSHHOME CLIENT=$CLIENT -i bash --rcfile $SSHHOME/.bashrc
+exec sudo SSHHOME=$SSHHOME CLIENT=$CLIENT -i bash --rcfile $SSHHOME/.bashrc

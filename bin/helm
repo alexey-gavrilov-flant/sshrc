@@ -1,1 +1,1 @@
-sudo helm $@
+exec sudo helm $@
