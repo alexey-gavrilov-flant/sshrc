@@ -1,0 +1,4 @@
+if [ -f $SSHHOME/.bash_secret ]; then . $SSHHOME/.bash_secret; fi
+ctr images pull registry.deckhouse.io/deckhouse/fe/install:stable --user ${dh_auth}
+mkdir -p /opt/local-path-provisioner/dhctl
+ctr run --rm -t --mount type=bind,src=/opt/local-path-provisioner/dhctl,dst=/tmp,options=rbind:rw --net-host registry.deckhouse.io/deckhouse/fe/install:stable dhctl bash

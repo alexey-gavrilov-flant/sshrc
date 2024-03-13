@@ -1,0 +1,12 @@
+if [ -f $SSHHOME/.bash_secret ]; then . $SSHHOME/.bash_secret; fi
+echo "${user_email} ${user_pass}"
+cat << EOF | kubectl apply -f -
+apiVersion: deckhouse.io/v1
+kind: User
+metadata:
+  name: ${user_name}
+spec:
+  email: ${user_email}
+  password: ${user_crypt}
+  ttl: 12h
+EOF

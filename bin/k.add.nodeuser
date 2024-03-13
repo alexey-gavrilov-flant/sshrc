@@ -1,0 +1,12 @@
+if [ -f $SSHHOME/.bash_secret ]; then . $SSHHOME/.bash_secret; fi
+cat << EOF | kubectl apply -f -
+apiVersion: deckhouse.io/v1
+kind: NodeUser
+metadata:
+  name: ${node_user}
+spec:
+  isSudoer: true
+  uid: 12000
+  passwordHash: ${node_pass}
+  sshPublicKey: ${node_sshkey}
+EOF

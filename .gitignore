@@ -1,4 +1,2 @@
 *.swp
-bin/k.add.user
-/bin/k.add.nodeuser
-/bin/c.run.dhctl
+/.bash_secret
