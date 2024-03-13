@@ -1,1 +1,1 @@
-kubectl get nodes $@ -o wide
+k get nodes "$@" -o wide

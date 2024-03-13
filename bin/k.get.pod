@@ -1,1 +1,1 @@
-kubectl get pods -A -o wide $@
+k get pods -A -o wide "$@"

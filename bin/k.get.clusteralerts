@@ -1,1 +1,1 @@
-kubectl get clusteralerts $@
+k get clusteralerts "$@"

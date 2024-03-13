@@ -1,1 +1,1 @@
-kubectl get events --sort-by=.metadata.creationTimestamp $@
+k get events --sort-by=.metadata.creationTimestamp "$@"

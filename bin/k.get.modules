@@ -1,1 +1,1 @@
-kubectl get modules $@
+k get modules "$@"

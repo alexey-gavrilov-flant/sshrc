@@ -17,7 +17,9 @@ cat <<EOF
     "hostNetwork": true,
     "containers": [
       {
-        "securityContext": { "privileged":true },
+        "securityContext": {
+          "privileged": true
+        },
         "image": "busybox:stable",
         "name": "debug",
         "stdin": true,
@@ -36,5 +38,5 @@ cat <<EOF
 EOF
 )"
 
-kubectl delete pod $node --ignore-not-found=true --force 2>/dev/null
-kubectl run "$node" --image "busybox:stable" --restart=Never --rm --overrides="$overrides" --pod-running-timeout="1m" $([ "$tty" = true ] && echo -t) -i "debug"
+k delete pod $node --ignore-not-found=true --force 2>/dev/null
+k run "$node" --image "busybox:stable" --restart=Never --rm --overrides="$overrides" --pod-running-timeout="1m" $([ "$tty" = true ] && echo -t) -i "debug"
