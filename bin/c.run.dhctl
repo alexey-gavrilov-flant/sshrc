@@ -1,4 +1,51 @@
+DH_VERSION=stable
+DH_EDITION=fe
+DH_REGESTRY="registry.deckhouse.io/deckhouse"
+if [ ! -z $1 ]; then DH_VERSION=$1; fi
+if [ ! -z $2 ]; then
+  if [ "$2" == "dev" ]; then
+    DH_REGESTRY="dev-registry.deckhouse.io/sys"
+    DH_EDITION="deckhouse-oss"
+  else
+    DH_EDITION=$2;
+  fi
+fi
 if [ -f $SSHHOME/.bash_secret ]; then . $SSHHOME/.bash_secret; fi
-ctr images pull registry.deckhouse.io/deckhouse/fe/install:stable --user ${dh_auth}
-mkdir -p /opt/local-path-provisioner/dhctl
-ctr run --rm -t --mount type=bind,src=/opt/local-path-provisioner/dhctl,dst=/tmp,options=rbind:rw --net-host registry.deckhouse.io/deckhouse/fe/install:stable dhctl bash
+
+ctr images pull ${DH_REGESTRY}/${DH_EDITION}/install:${DH_VERSION} --user ${DHCTL_CLI_MIRROR_SOURCE_LOGIN}:${DHCTL_CLI_MIRROR_SOURCE_PASSWORD}
+
+cat > /dev/shm/init.sh <<EOF
+#!/bin/bash
+mkdir /tmp/d8-images
+cp -r /home/user/.ssh ~/
+cat /cmd
+exec bash
+EOF
+
+cat > /dev/shm/cmd <<EOF
+dhctl terraform check
+dhctl config edit provider-cluster-configuration
+dhctl converge
+  --ask-become-pass --ssh-host
+  --ssh-agent-private-keys=~/.ssh/tfadm-id-rsa --ssh-user=ubuntu --ssh-host
+
+dhctl bootstrap --config=/config/config.yml --ssh-agent-private-keys=~/.ssh/local --ssh-user=ubuntu
+dhctl bootstrap --config=/config/config-dev-yc.yml  --resources=/config/resources.yaml --ssh-agent-private-keys=~/.ssh/local --ssh-user=ubuntu
+
+dhctl destroy --yes-i-am-sane-and-i-understand-what-i-am-doing --ssh-agent-private-keys=~/.ssh/local --ssh-user=ubuntu --ssh-host
+dhctl config render bashible-bundle --config=/config/config-dev-yc.yml --bundle-name=ubuntu-lts
+dhctl mirror --images-bundle-path /tmp/d8-images/d8.tar
+dhctl mirror --images-bundle-path /tmp/d8-images/d8.tar --registry="" --registry-login="" --registry-password=""
+EOF
+
+chmod +x /dev/shm/init.sh
+ctr run --rm -t \
+  --mount type=bind,src=$PWD,dst=/config,options=rbind:ro \
+  --mount type=bind,src=$HOME/.ssh/,dst=/home/user/.ssh,options=rbind:ro \
+  --mount type=bind,src=/dev/shm/init.sh,dst=/init.sh,options=rbind:ro \
+  --mount type=bind,src=/dev/shm/cmd,dst=/cmd,options=rbind:ro \
+  --env-file $SSHHOME/.bash_secret \
+  --net-host ${DH_REGESTRY}/${DH_EDITION}/install:${DH_VERSION} \
+  dhctl \
+  /init.sh
+rm /dev/shm/init.sh /dev/shm/cmd

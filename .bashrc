@@ -21,14 +21,5 @@ if [ -f /usr/share/bash-completion/bash_completion ] && ! shopt -oq posix; then
   complete -o default -F __start_kubectl k
 fi
 export PATH=$SSHHOME:$SSHHOME/bin:/opt/deckhouse/bin/:$PATH:~/bin
-
-if [ -f /opt/deckhouse/bin/kubectl ]; then
-  alias k="sudo /opt/deckhouse/bin/kubectl --kubeconfig=/root/.kube/config"
-  alias kubectl="sudo /opt/deckhouse/bin/kubectl --kubeconfig=/root/.kube/config"
-else
-  alias k="sudo kubectl --kubeconfig=/root/.kube/config"
-  alias kubectl="sudo kubectl --kubeconfig=/root/.kube/config"
-fi
-
 export VIMINIT="let \$MYVIMRC='$SSHHOME/.vimrc' | source \$MYVIMRC"
 . $SSHHOME/.bash_aliases

@@ -1,0 +1,1 @@
+exec sudo /opt/deckhouse/bin/ctr "$@"
