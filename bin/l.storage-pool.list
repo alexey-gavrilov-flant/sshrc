@@ -1,0 +1,1 @@
+l storage-pool list "$@"

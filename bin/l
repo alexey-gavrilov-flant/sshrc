@@ -1,0 +1,2 @@
+ns=$(k get ns d8-sds-drbd d8-linstor --ignore-not-found=true -ojsonpath='{.items[*].metadata.name}')
+k exec -n $ns deploy/linstor-controller -- linstor "$@"
