@@ -12,7 +12,7 @@ shopt -s histappend
 HISTSIZE=30000
 HISTFILESIZE=40000
 
-comm=$(cat /proc/$(ps -o ppid= -p $$)/comm)
+comm=$(cat /proc/$(ps -o ppid:1= -p $$)/comm)
 if [[ "${comm}" == "sshd" ]]; then
   trap "rm -rf $SSHRCCLEANUP; exit" 0
 fi

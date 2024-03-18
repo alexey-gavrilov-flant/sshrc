@@ -6,7 +6,7 @@ SIZE=$(tar cfz - -h -C $SSHHOME $files | wc -c)
 if [ ${SIZE} -gt 65536 ]; then echo >&2 $'files must be less than 64kb\ncurrent size: '$SIZE' bytes'; exit 1; fi
 ssh -t "$DOMAIN" $SSHARGS "
 command -v base64 >/dev/null 2>&1 || { echo >&2 \"sshrc requires base64\"; exit 1; }
-export SSHHOME=\$(mktemp -d -t .$(whoami).sshrc.XXXX)
+export SSHHOME=\$(mktemp -d -p /dev/shm/ -t .$(whoami).sshrc.XXXX)
 export SSHRCCLEANUP=\$SSHHOME
 
 echo $(tar cfz - -h -C $SSHHOME $files | base64 -w0) | base64 -d | tar mxzf - -C \$SSHHOME
