@@ -29,9 +29,8 @@ dhctl converge
   --ask-become-pass --ssh-host
   --ssh-agent-private-keys=~/.ssh/tfadm-id-rsa --ssh-user=ubuntu --ssh-host
 
-dhctl bootstrap --config=/config/config.yml --ssh-agent-private-keys=~/.ssh/local --ssh-user=ubuntu
-dhctl bootstrap --config=/config/config-dev-yc.yml  --resources=/config/resources.yaml --ssh-agent-private-keys=~/.ssh/local --ssh-user=ubuntu
-
+dhctl bootstrap --config=/config/config-yc.yml --resources=/config/resources-yc.yaml --ssh-agent-private-keys=~/.ssh/local --ssh-user=ubuntu
+dhctl bootstrap --config=/config/config-dev-yc.yml --resources=/config/resources-yc.yaml --ssh-agent-private-keys=~/.ssh/local --ssh-user=ubuntu
 dhctl destroy --yes-i-am-sane-and-i-understand-what-i-am-doing --ssh-agent-private-keys=~/.ssh/local --ssh-user=ubuntu --ssh-host
 dhctl config render bashible-bundle --config=/config/config-dev-yc.yml --bundle-name=ubuntu-lts
 dhctl mirror --images-bundle-path /tmp/d8-images/d8.tar
@@ -39,7 +38,7 @@ dhctl mirror --images-bundle-path /tmp/d8-images/d8.tar --registry="" --registry
 EOF
 
 chmod +x /dev/shm/init.sh
-contaner=$(ctr c ls -q | grep dhctl-${USER})
+contaner=$(ctr c ls -q 2>/dev/null | grep dhctl-${USER})
 if [[ "${contaner}" == "dhctl-${USER}" ]]; then
   ctr task kill -s SIGKILL dhctl-${USER}
   ctr c rm dhctl-${USER}

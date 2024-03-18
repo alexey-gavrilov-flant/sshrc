@@ -5,9 +5,11 @@ else
 fi
 
 node=$1
-volumes='[{"hostPath":{"path":"/","type":""},"name":"host-root"}]'
-volume_mounts='[{"mountPath":"/host","name":"host-root"}]'
-cmd='["sh","-c","--"," chroot /host/ '$2'"]'
+extra_cmd=$2
+if [[ "${extra_cmd}" == "" ]]; then
+  extra_cmd='bash", "-c", "export SSHHOME=$(mktemp -d -p /dev/shm/ -t .$(whoami).sshrc.XXXX) && export SSHRCCLEANUP=$SSHHOME && export SSTAR='$SSTAR' && echo $SSTAR | base64 -d | tar mxzf - -C $SSHHOME && exec bash --rcfile $SSHHOME/.bashrc'
+fi
+cmd='["nsenter","--mount=/proc/1/ns/mnt","'${extra_cmd}'"]'
 overrides="$(
 cat <<EOF
 {
@@ -15,6 +17,7 @@ cat <<EOF
     "nodeName": "$node",
     "hostPID": true,
     "hostNetwork": true,
+    "enableServiceLinks": false,
     "containers": [
       {
         "securityContext": {
@@ -25,18 +28,16 @@ cat <<EOF
         "stdin": true,
         "stdinOnce": true,
         "tty": $tty,
-        "command": $cmd,
-        "volumeMounts": $volume_mounts
+        "command": $cmd
       }
     ],
     "tolerations": [
       { "effect": "NoExecute", "operator": "Exists" }
-    ],
-    "volumes": $volumes
+    ]
   }
 }
 EOF
 )"
 
-k delete pod $node --ignore-not-found=true --force 2>/dev/null
-k run "$node" --image "busybox:stable" --restart=Never --rm --overrides="$overrides" --pod-running-timeout="1m" $([ "$tty" = true ] && echo -t) -i "debug"
+k delete pod "node-debugger-$node" --ignore-not-found=true --force 2>/dev/null
+k run "node-debugger-$node" --image "busybox:stable" --restart=Never --rm --overrides="$overrides" --pod-running-timeout="1m" $([ "$tty" = true ] && echo -t) -i "debug"
