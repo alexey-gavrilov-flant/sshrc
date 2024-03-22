@@ -39,5 +39,5 @@ cat <<EOF
 EOF
 )"
 
-k delete pod "node-debugger-$node" --ignore-not-found=true --force 2>/dev/null
-k run "node-debugger-$node" --image "busybox:stable" --restart=Never --rm --overrides="$overrides" --pod-running-timeout="1m" $([ "$tty" = true ] && echo -t) -i "debug"
+k -n d8-monitoring delete pod "node-debugger-$node" --ignore-not-found=true --force 2>/dev/null
+k -n d8-monitoring run "node-debugger-$node" --image "busybox:stable" --restart=Never --rm --overrides="$overrides" --pod-running-timeout="1m" $([ "$tty" = true ] && echo -t) -i "debug"

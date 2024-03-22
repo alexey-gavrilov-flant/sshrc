@@ -1,0 +1,41 @@
+if [ ! -z $1 ]; then
+  if [ "$1" == "c" ]; then
+cat << EOF | kubectl apply -f -
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: debug
+  namespace: default
+spec:
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: debug
+  template:
+    metadata:
+      labels:
+        app: debug
+    spec:
+      containers:
+      - name: debug
+        image: nicolaka/netshoot
+        imagePullPolicy: IfNotPresent
+        command: ["sh", "-c", "--", "sleep 100000"]
+      terminationGracePeriodSeconds: 0
+      tolerations:
+      - key: node-role.kubernetes.io/master
+      - key: node-role.kubernetes.io/control-plane
+      - key: dedicated.deckhouse.io
+        operator: Exists
+      - key: dedicated
+        operator: Exists
+      - key: DeletionCandidateOfClusterAutoscaler
+      - key: ToBeDeletedByClusterAutoscaler
+      - key: drbd.linbit.com/lost-quorum
+      - key: drbd.linbit.com/force-io-error
+      - key: drbd.linbit.com/ignore-fail-over
+EOF
+  fi
+else
+  k delete ds -n default debug
+fi
