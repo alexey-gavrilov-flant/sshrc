@@ -19,6 +19,10 @@ if [[ "${comm}" == "sshd" || "${comm}" == "containerd-shim" ]]; then
   trap "rm -rf $SSHRCCLEANUP; exit" 0
 fi
 
+export PATH=$SSHHOME:$SSHHOME/bin:/opt/deckhouse/bin/:$PATH:~/bin
+export VIMINIT="let \$MYVIMRC='$SSHHOME/.vimrc' | source \$MYVIMRC"
+. $SSHHOME/.bash_aliases
+
 if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
   . /etc/bash_completion
 fi
@@ -31,6 +35,3 @@ if [ -f ~/.kube/completion.bash.inc ]; then
   . ~/.kube/completion.bash.inc
   complete -o default -F __start_kubectl k
 fi
-export PATH=$SSHHOME:$SSHHOME/bin:/opt/deckhouse/bin/:$PATH:~/bin
-export VIMINIT="let \$MYVIMRC='$SSHHOME/.vimrc' | source \$MYVIMRC"
-. $SSHHOME/.bash_aliases
