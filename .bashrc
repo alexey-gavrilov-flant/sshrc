@@ -21,10 +21,14 @@ fi
 
 if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
   . /etc/bash_completion
-  complete -o default -F __start_kubectl k
 fi
 if [ -f /usr/share/bash-completion/bash_completion ] && ! shopt -oq posix; then
   . /usr/share/bash-completion/bash_completion
+fi
+if [ ! -d ~/.kube ]; then mkdir ~/.kube; fi
+if [ ! -f ~/.kube/completion.bash.inc ]; then kubectl completion bash > ~/.kube/completion.bash.inc; fi
+if [ -f ~/.kube/completion.bash.inc ]; then
+  . ~/.kube/completion.bash.inc
   complete -o default -F __start_kubectl k
 fi
 export PATH=$SSHHOME:$SSHHOME/bin:/opt/deckhouse/bin/:$PATH:~/bin
