@@ -2,6 +2,5 @@
 etcd=`kubectl -n kube-system get pod -l component=etcd,tier=control-plane -o json | jq -r '.items[] | select( .status.conditions[] | select(.type == "ContainersReady" and .status == "True")) | .metadata.name' | head -n1`
 cmd="kubectl -n kube-system exec --stdin --tty $etcd -- etcdctl --cacert /etc/kubernetes/pki/etcd/ca.crt --cert /etc/kubernetes/pki/etcd/ca.crt --key /etc/kubernetes/pki/etcd/ca.key --endpoints"
 endpoints=`eval "$cmd https://127.0.0.1:2379/ member list -w table | grep https | awk -v ORS=\",\" '{print \\\$10 }' | sed 's/,$//'"`
-#eval "$cmd https://127.0.0.1:2379/ member list -w table'"
 eval "$cmd $endpoints member list -w table"
 eval "$cmd $endpoints endpoint status -w table"
