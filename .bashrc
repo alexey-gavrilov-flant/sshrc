@@ -19,19 +19,22 @@ if [[ "${comm}" == "sshd" || "${comm}" == "containerd-shim" ]]; then
   trap "rm -rf $SSHRCCLEANUP; exit" 0
 fi
 
-export PATH=$SSHHOME:$SSHHOME/bin:/opt/deckhouse/bin/:$PATH:~/bin
-export VIMINIT="let \$MYVIMRC='$SSHHOME/.vimrc' | source \$MYVIMRC"
-. $SSHHOME/.bash_aliases
-
+export PATH=/opt/deckhouse/bin/:$PATH
 if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
   . /etc/bash_completion
 fi
 if [ -f /usr/share/bash-completion/bash_completion ] && ! shopt -oq posix; then
   . /usr/share/bash-completion/bash_completion
 fi
-if [ ! -d ~/.kube ]; then mkdir ~/.kube; fi
-if [ ! -f ~/.kube/completion.bash.inc ]; then kubectl completion bash > ~/.kube/completion.bash.inc; fi
-if [ -f ~/.kube/completion.bash.inc ]; then
-  . ~/.kube/completion.bash.inc
-  complete -o default -F __start_kubectl k
+if command -v kubectl &> /dev/null; then
+  if [ ! -d ~/.kube ]; then mkdir ~/.kube; fi
+  if [ ! -f ~/.kube/completion.bash.inc ]; then kubectl completion bash > ~/.kube/completion.bash.inc; fi
+  if [ -f ~/.kube/completion.bash.inc ]; then
+    . ~/.kube/completion.bash.inc
+    complete -o default -F __start_kubectl k
+  fi
 fi
+
+export VIMINIT="let \$MYVIMRC='$SSHHOME/.vimrc' | source \$MYVIMRC"
+export PATH=$SSHHOME:$SSHHOME/bin:$PATH:~/bin
+. $SSHHOME/.bash_aliases

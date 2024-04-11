@@ -32,6 +32,7 @@ dhctl converge
 dhctl bootstrap --config=/config/config-yc.yml --resources=/config/resources-yc.yaml --ssh-agent-private-keys=~/.ssh/local --ssh-user=ubuntu
 dhctl bootstrap --config=/config/config-dev-yc.yml --resources=/config/resources-yc.yaml --ssh-agent-private-keys=~/.ssh/local --ssh-user=ubuntu
 dhctl destroy --yes-i-am-sane-and-i-understand-what-i-am-doing --ssh-agent-private-keys=~/.ssh/local --ssh-user=ubuntu --ssh-host
+  --ssh-bastion-user=ubuntu --ssh-bastion-host=
 dhctl config render bashible-bundle --config=/config/config-dev-yc.yml --bundle-name=ubuntu-lts
 dhctl mirror --images-bundle-path /tmp/d8-images/d8.tar
 dhctl mirror --images-bundle-path /tmp/d8-images/d8.tar --registry="" --registry-login="" --registry-password=""
