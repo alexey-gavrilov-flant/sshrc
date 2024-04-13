@@ -1,1 +1,8 @@
-sudo /opt/deckhouse/bin/crictl "$@"
+cmd=$(find.bin crictl)
+if [ "$cmd" != "" ]; then
+  if [ "$EUID" -ne 0 ]; then
+    exec sudo $cmd "$@"
+  else
+    exec $cmd "$@"
+  fi
+fi
