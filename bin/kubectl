@@ -1,7 +1,8 @@
-kubectl=kubectl
-if [ -f /opt/deckhouse/bin/kubectl ]; then kubectl=/opt/deckhouse/bin/kubectl; fi
-if [ "$EUID" -ne 0 ]; then
-  exec sudo $kubectl --kubeconfig=/root/.kube/config "$@"
-else
-  exec $kubectl --kubeconfig=/root/.kube/config "$@"
+cmd=$(find.bin kubectl)
+if [ "$cmd" != "" ]; then
+  if [ "$EUID" -ne 0 ]; then
+    exec sudo $cmd --kubeconfig=/root/.kube/config "$@"
+  else
+    exec $cmd --kubeconfig=/root/.kube/config "$@"
+  fi
 fi

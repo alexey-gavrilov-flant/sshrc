@@ -1,0 +1,1 @@
+find ${PATH//:/ } -maxdepth 1 -executable -name $1 2>/dev/null | grep -v "^$SSHHOME" | head -n1

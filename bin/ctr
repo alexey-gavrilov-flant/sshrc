@@ -1,1 +1,8 @@
-exec sudo /opt/deckhouse/bin/ctr "$@"
+cmd=$(find.bin ctr)
+if [ "$cmd" != "" ]; then
+  if [ "$EUID" -ne 0 ]; then
+    exec sudo $cmd "$@"
+  else
+    exec $cmd "$@"
+  fi
+fi

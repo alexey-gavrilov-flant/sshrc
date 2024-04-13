@@ -1,1 +1,8 @@
-exec sudo helm $@
+cmd=$(find.bin helm)
+if [ "$cmd" != "" ]; then
+  if [ "$EUID" -ne 0 ]; then
+    exec sudo $cmd "$@"
+  else
+    exec $cmd "$@"
+  fi
+fi
