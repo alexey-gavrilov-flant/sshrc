@@ -1,0 +1,8 @@
+if [[ "${#@}" == "2" ]]; then
+  ns=$1
+  name=$2
+else
+  name=$1
+  ns=d8-system
+fi
+helm -n $ns get manifest $name | kubectl diff -f -
