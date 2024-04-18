@@ -22,9 +22,10 @@ fi
 export PATH=/opt/deckhouse/bin/:$PATH
 if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
   . /etc/bash_completion
-fi
-if [ -f /usr/share/bash-completion/bash_completion ] && ! shopt -oq posix; then
-  . /usr/share/bash-completion/bash_completion
+else
+  if [ -f /usr/share/bash-completion/bash_completion ] && ! shopt -oq posix; then
+    . /usr/share/bash-completion/bash_completion
+  fi
 fi
 if command -v kubectl &> /dev/null; then
   if [ ! -d ~/.kube ]; then mkdir ~/.kube; fi

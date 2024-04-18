@@ -1,3 +1,4 @@
+#!/bin/bash
 cmd=$(find.bin ctr)
 if [ "$cmd" != "" ]; then
   if [ "$EUID" -ne 0 ]; then
