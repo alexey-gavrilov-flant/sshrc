@@ -1,0 +1,6 @@
+count=$(kubectl -n d8-system get pods --no-headers -l app=deckhouse | wc -l)
+if [ "1" == "$count" ]; then
+  echo "$(kubectl -n d8-system get pods --no-headers -l app=deckhouse | awk '{print $1}')"
+else
+  echo "$(kubectl -n d8-system get leases.coordination.k8s.io deckhouse-leader-election -o jsonpath='{.spec.holderIdentity}' | awk -F'.' '{ print $1}')"
+fi
