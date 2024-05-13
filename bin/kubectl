@@ -1,9 +1,13 @@
 #!/bin/bash
 cmd=$(find.bin kubectl)
 if [ "$cmd" != "" ]; then
-  if [ "$EUID" -ne 0 ]; then
-    exec sudo $cmd --kubeconfig=/root/.kube/config "$@"
+  if [ -f ~/.kube/config ]; then
+    exec $cmd "$@"
   else
-    exec $cmd --kubeconfig=/root/.kube/config "$@"
+    if [ "$EUID" -ne 0 ]; then
+      exec sudo $cmd --kubeconfig=/root/.kube/config "$@"
+    else
+      exec $cmd --kubeconfig=/root/.kube/config "$@"
+    fi
   fi
 fi
