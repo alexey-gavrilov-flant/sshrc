@@ -4,7 +4,8 @@ fi
 #PS1
 SCREEN="\[\033[01;31m\][ssh]";
 if [ -n "${KUBERNETES_PORT}" ]; then SCREEN="\[\033[01;31m\][exec]"; fi
-if [[ "$TERM" == "screen" ]]; then SCREEN="[screen]"; fi
+comm=$(cat /proc/$(ps -o ppid:1= -p $$)/comm)
+if [[ "$comm" == "screen" ]]; then SCREEN="[screen]"; fi
 USER_PS="\[\033[01;32m\][\u"; if [[ ${EUID} == 0 ]]; then USER_PS="\[\033[01;31m\][\u"; fi
 CLIENT_PS="$CLIENT."; if [[ $CLIENT == "" ]]; then CLIENT_PS=""; fi
 PS1="\[\033[01;33m\][\$(date +%H:%M:%S -u)]$SCREEN$USER_PS@$CLIENT_PS\h]\[\033[01;34m\] \w \$\[\033[00m\] "
@@ -14,9 +15,10 @@ shopt -s histappend
 HISTSIZE=30000
 HISTFILESIZE=40000
 
-comm=$(cat /proc/$(ps -o ppid:1= -p $$)/comm)
-if [[ "${comm}" == "sshd" || "${comm}" == "containerd-shim" ]]; then
-  trap "rm -rf $SSHRCCLEANUP; exit" 0
+if [[ "${comm}" == "sshd" || "${comm}" == "containerd-shim" || "${comm}" == "screen" ]]; then
+  if [[ "$SSHRCCLEANUP" != "" ]]; then
+    trap "rm -rf $SSHRCCLEANUP; exit" 0
+  fi
 fi
 
 export PATH=/opt/deckhouse/bin/:$PATH

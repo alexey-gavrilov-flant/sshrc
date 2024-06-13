@@ -11,7 +11,6 @@ export SSHRCCLEANUP=\$SSHHOME
 export SSTAR=$(tar cfz - -h -C $SSHHOME $files | base64 -w0)
 
 echo \$SSTAR | base64 -d | tar mxzf - -C \$SSHHOME
-export SSHHOME=\$SSHHOME
 export CLIENT=`echo $DOMAIN | grep -Po '^(?!.*@)([^.]+)'`
 echo \"$CMDARG\" >> \$SSHHOME/.bashrc
 exec bash --rcfile \$SSHHOME/.bashrc
