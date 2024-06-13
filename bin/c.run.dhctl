@@ -29,8 +29,9 @@ dhctl converge
   --ask-become-pass --ssh-host
   --ssh-agent-private-keys=~/.ssh/tfadm-id-rsa --ssh-user=ubuntu --ssh-host
 
-dhctl bootstrap --config=/config/config-yc.yml --resources=/config/resources-yc.yaml --ssh-agent-private-keys=~/.ssh/local --ssh-user=ubuntu
-dhctl bootstrap --config=/config/config-dev-yc.yml --resources=/config/resources-yc.yaml --ssh-agent-private-keys=~/.ssh/local --ssh-user=ubuntu
+dhctl bootstrap --config=/config/config-yc.yml --ssh-agent-private-keys=~/.ssh/local --ssh-user=ubuntu
+dhctl bootstrap --config=/config/config-dev-yc.yml --ssh-agent-private-keys=~/.ssh/local --ssh-user=ubuntu
+dhctl bootstrap-phase abort --yes-i-am-sane-and-i-understand-what-i-am-doing --config=/config/config-dev-yc.yml
 dhctl destroy --yes-i-am-sane-and-i-understand-what-i-am-doing --ssh-agent-private-keys=~/.ssh/local --ssh-user=ubuntu --ssh-host
   --ssh-bastion-user=ubuntu --ssh-bastion-host=
 dhctl config render bashible-bundle --config=/config/config-dev-yc.yml --bundle-name=ubuntu-lts
