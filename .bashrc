@@ -37,6 +37,9 @@ if command -v kubectl &> /dev/null; then
     complete -o default -F __start_kubectl k
   fi
 fi
+if command -v d8 &> /dev/null; then
+  source <(d8 completion bash)
+fi
 
 export VIMINIT="let \$MYVIMRC='$SSHHOME/.vimrc' | source \$MYVIMRC"
 export PATH=$SSHHOME:$SSHHOME/bin:$PATH:~/bin
