@@ -1,1 +1,7 @@
-exec sudo SSTAR=$SSTAR SSHHOME=$SSHHOME CLIENT=$CLIENT -i bash --rcfile $SSHHOME/.bashrc
+cat > $SSHHOME/bin/s-bash <<EOF
+#!/bin/bash
+export SSTAR=$SSTAR SSHHOME=$SSHHOME CLIENT=$CLIENT
+exec bash --rcfile \$SSHHOME/.bashrc
+EOF
+chmod +x $SSHHOME/bin/s-bash
+exec sudo -i $SSHHOME/bin/s-bash
