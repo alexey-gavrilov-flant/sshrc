@@ -1,10 +1,15 @@
 IMAGE=docker.io/amazon/aws-cli:latest
 ctr images pull ${IMAGE}
 
+CONFIG=$(k.dhctl.get.provider-cluster-configuration)
+AWS_ACCESS_KEY_ID=`grep "providerAccessKeyId:" <<< ${CONFIG} | awk '{print $2}'`
+AWS_SECRET_ACCESS_KEY=`grep "providerSecretAccessKey:" <<< ${CONFIG} | awk '{print $2}'`
+AWS_DEFAULT_REGION=`grep "region:" <<< ${CONFIG} | awk '{print $2}'`
+
 cat > /dev/shm/cmd <<EOF
 aws-cli 
-$(k.dhctl.get.provider-cluster-configuration | grep -E "(providerAccessKeyId|providerSecretAccessKey|region):")
-aws configure
+yum install jq vim -y
+aws ec2 describe-instances --filters "Name=tag:Name,Values=kube-dev-master*" | jq .Reservations[].Instances[].Placement
 EOF
 
 cat > /dev/shm/init.sh <<EOF
@@ -13,7 +18,6 @@ cat /cmd
 exec bash
 EOF
 
-
 chmod +x /dev/shm/init.sh
 NAME=aws-cli
 contaner=$(ctr c ls -q 2>/dev/null | grep ${NAME}-${USER})
@@ -21,11 +25,12 @@ if [[ "${contaner}" == "${NAME}-${USER}" ]]; then
   ctr task kill -s SIGKILL ${NAME}-${USER}
   ctr c rm ${NAME}-${USER}
 fi
-#ctr task attach dhctl
 ctr run --rm -t \
   --mount type=bind,src=/dev/shm/init.sh,dst=/init.sh,options=rbind:ro \
   --mount type=bind,src=/dev/shm/cmd,dst=/cmd,options=rbind:ro \
-  --env-file $SSHHOME/.bash_secret \
+  --env AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
+  --env AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
+  --env AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION} \
   --net-host ${IMAGE} \
   ${NAME}-${USER} \
   /init.sh
