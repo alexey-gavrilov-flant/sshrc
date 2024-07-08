@@ -1,0 +1,32 @@
+IMAGE=docker.io/amazon/aws-cli:latest
+ctr images pull ${IMAGE}
+
+cat > /dev/shm/cmd <<EOF
+aws-cli 
+$(k.dhctl.get.provider-cluster-configuration | grep -E "(providerAccessKeyId|providerSecretAccessKey|region):")
+aws configure
+EOF
+
+cat > /dev/shm/init.sh <<EOF
+#!/bin/bash
+cat /cmd
+exec bash
+EOF
+
+
+chmod +x /dev/shm/init.sh
+NAME=aws-cli
+contaner=$(ctr c ls -q 2>/dev/null | grep ${NAME}-${USER})
+if [[ "${contaner}" == "${NAME}-${USER}" ]]; then
+  ctr task kill -s SIGKILL ${NAME}-${USER}
+  ctr c rm ${NAME}-${USER}
+fi
+#ctr task attach dhctl
+ctr run --rm -t \
+  --mount type=bind,src=/dev/shm/init.sh,dst=/init.sh,options=rbind:ro \
+  --mount type=bind,src=/dev/shm/cmd,dst=/cmd,options=rbind:ro \
+  --env-file $SSHHOME/.bash_secret \
+  --net-host ${IMAGE} \
+  ${NAME}-${USER} \
+  /init.sh
+rm /dev/shm/init.sh /dev/shm/cmd

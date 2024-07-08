@@ -21,7 +21,7 @@ if [[ "${comm}" == "sshd" || "${comm}" == "containerd-shim" || "${comm}" == "scr
   fi
 fi
 
-export PATH=/opt/deckhouse/bin/:$PATH
+export PATH=/opt/deckhouse/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
   . /etc/bash_completion
 else
