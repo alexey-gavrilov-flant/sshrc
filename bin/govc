@@ -3,11 +3,17 @@
 if [ ! -f ~/bin/govc.bin ]; then
   mkdir -p ~/bin/
   curl -L -o - "https://github.com/vmware/govmomi/releases/latest/download/govc_$(uname -s)_$(uname -m).tar.gz" | tar -C ~/bin -xvzf - govc
-  mv ~/bin/govc ~/bin/govc.bin
 fi
-
-CONFIG=$(k.dhctl.get.provider-cluster-configuration)
+CONFIG=$(k.dhctl.get.provider-cluster-configuration 2>/dev/null)
 if [ ! -z "${CONFIG}" ]; then
-  GOVC_URL=""
+  GOVC_URL="https://  /sdk"
+  GOVC_USERNAME=""
+  GOVC_PASSWORD=""
+  GOVC_INSECURE=true
 fi
-~/bin/govc.bin $@
+if [ -z "${GOVC_URL}" ]; then
+  echo "https://github.com/vmware/govmomi/blob/main/govc/README.md"
+  echo "GOVC_URL=https://user:pass@host/sdk"
+else
+  ~/bin/govc $@
+fi
