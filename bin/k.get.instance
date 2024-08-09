@@ -1,1 +1,1 @@
-kubectl get instance
+kubectl get instances.deckhouse.io

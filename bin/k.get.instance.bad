@@ -1,1 +1,1 @@
-kubectl get instance | grep -v Running
+kubectl get instances.deckhouse.io | grep -v Running
