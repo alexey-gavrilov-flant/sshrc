@@ -1,1 +1,3 @@
 kubectl -n kube-system get secrets d8-provider-cluster-configuration -o jsonpath='{.data.cloud-provider-cluster-configuration\.yaml}' | base64 -d
+echo ""
+kubectl -n kube-system get secrets d8-provider-cluster-configuration -o jsonpath='{.data.cloud-provider-discovery-data\.json}' | base64 -d | jq .
