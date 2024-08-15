@@ -17,7 +17,7 @@ containerPort=`jq -r .spec.template.spec.containers[].ports[].containerPort <<< 
 name=$deploy-mock
 
 key=`base64 -w0 <<< $node_sshkey`
-cmd='["sh", "-c", "--", "mkdir /root/.ssh && echo '${key}' | base64 -d > /root/.ssh/authorized_keys && apt update && apt install -y openssh-server python3 && mkdir /run/sshd && echo "GatewayPorts yes" > /etc/ssh/sshd_config.d/0.conf && /usr/sbin/sshd -D" ]'
+cmd='["sh", "-c", "--", "mkdir /root/.ssh && echo '${key}' | base64 -d > /root/.ssh/authorized_keys && apt update && apt install -y openssh-server python3 && mkdir /run/sshd && echo \"GatewayPorts yes\" > /etc/ssh/sshd_config.d/0.conf && /usr/sbin/sshd -D" ]'
 overrides="$(
 cat <<EOF
 {
@@ -46,14 +46,14 @@ cat <<EOF
 EOF
 )"
 
-k -n "$ns" delete pod "$name" --ignore-not-found=true --force 1>2 2>/dev/null
-k -n "$ns" run "$name" --image "debian:12" --restart=Never --overrides="$overrides" 1>2 2>/dev/null
-k -n "$ns" wait --for=condition=Ready pod "$name" 1>2 2>/dev/null
+k -n "$ns" delete pod "$name" --ignore-not-found=true --force 1>/dev/null 2>/dev/null 
+k -n "$ns" run "$name" --image "debian:12" --restart=Never --overrides="$overrides" 1>/dev/null
+k -n "$ns" wait --for=condition=Ready pod "$name" 1>/dev/null
 
 podIP=`k -n d8-cloud-instance-manager get pod caps-controller-manager-mock -ojson | jq -r .status.podIP`
 if [[ "${podIP}" == "" ]]; then exit 1; fi
 
-k -n "$ns" scale deployment "$deploy" --replicas 0
+k -n "$ns" scale deployment "$deploy" --replicas 0 1>/dev/null 
 
 masterIP=`curl ip.flant.ru 2>/dev/null`
 clusterIP=`k get service kubernetes -ojson | jq -r .spec.clusterIP`
