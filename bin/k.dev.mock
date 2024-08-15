@@ -13,7 +13,8 @@ volumes=`jq -r .spec.template.spec.volumes <<< $json`
 volumeMounts=`jq -r .spec.template.spec.containers[].volumeMounts <<< $json`
 tolerations=`jq -r .spec.template.spec.tolerations <<< $json`
 nodeSelector=`jq -r .spec.template.spec.nodeSelector <<< $json`
-containerPort=`jq -r .spec.template.spec.containers[].ports[].containerPort <<< $json`
+ports=`jq -r .spec.template.spec.containers[].ports <<< $json`
+containerPort=`jq -r .[].containerPort <<< $ports`
 name=$deploy-mock
 
 key=`base64 -w0 <<< $node_sshkey`
@@ -35,6 +36,7 @@ cat <<EOF
         "stdin": true,
         "stdinOnce": true,
         "command": $cmd,
+        "ports": $ports,
         "volumeMounts": $volumeMounts
       }
     ],
