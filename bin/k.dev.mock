@@ -62,3 +62,4 @@ echo "sshfs -o allow_other,default_permissions -o ssh_command=\"ssh -J $USER@$ma
 jq -r '.[] | "mkdir -p " + .mountPath + " && sshfs -o allow_other,default_permissions -o ssh_command=\"ssh -J '$USER@$masterIP'\" root@'$podIP':" + .mountPath + " " + .mountPath' <<< $volumeMounts
 echo "ssh -J $USER@$masterIP root@$podIP -L6443:$clusterIP:443 -R $containerPort:127.0.0.1:$containerPort"
 echo "sshuttle --dns -NH -e 'ssh -J $USER@$masterIP' -r root@$podIP 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16"
+echo "k -n $ns scale deployment $deploy --replicas 0"
