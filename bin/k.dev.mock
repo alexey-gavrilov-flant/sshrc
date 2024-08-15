@@ -1,0 +1,64 @@
+if [ $# -eq 3 ]; then
+  echo "ns deploy"
+  exit 0
+fi
+if [ -f $SSHHOME/.bash_secret ]; then . $SSHHOME/.bash_secret; fi
+
+ns=$1
+deploy=$2
+
+json=`k -n $ns get deployments.apps $deploy -ojson`
+sa=`jq -r .spec.template.spec.serviceAccount <<< $json`
+volumes=`jq -r .spec.template.spec.volumes <<< $json`
+volumeMounts=`jq -r .spec.template.spec.containers[].volumeMounts <<< $json`
+tolerations=`jq -r .spec.template.spec.tolerations <<< $json`
+nodeSelector=`jq -r .spec.template.spec.nodeSelector <<< $json`
+containerPort=`jq -r .spec.template.spec.containers[].ports[].containerPort <<< $json`
+name=$deploy-mock
+
+key=`base64 -w0 <<< $node_sshkey`
+cmd='["sh", "-c", "--", "mkdir /root/.ssh && echo '${key}' | base64 -d > /root/.ssh/authorized_keys && apt update && apt install -y openssh-server python3 && mkdir /run/sshd && /usr/sbin/sshd -D" ]'
+overrides="$(
+cat <<EOF
+{
+  "metadata":{
+    "labels": {
+      "app": "$deploy"
+    }
+  },
+  "spec": {
+    "serviceAccount": "$sa",
+    "containers": [
+      {
+        "image": "debian:12",
+        "name": "debug",
+        "stdin": true,
+        "stdinOnce": true,
+        "command": $cmd,
+        "volumeMounts": $volumeMounts
+      }
+    ],
+    "volumes": $volumes,
+    "nodeSelector": $nodeSelector,
+    "tolerations": $tolerations
+  }
+}
+EOF
+)"
+
+k -n "$ns" delete pod "$name" --ignore-not-found=true --force 1>2 2>/dev/null
+k -n "$ns" run "$name" --image "debian:12" --restart=Never --overrides="$overrides" 1>2 2>/dev/null
+k -n "$ns" wait --for=condition=Ready pod "$name" 1>2 2>/dev/null
+
+podIP=`k -n d8-cloud-instance-manager get pod caps-controller-manager-mock -ojson | jq -r .status.podIP`
+if [[ "${podIP}" == "" ]]; then exit 1; fi
+
+k -n "$ns" scale deployment "$deploy" --replicas 0
+
+masterIP=`curl ip.flant.ru 2>/dev/null`
+clusterIP=`k get service kubernetes -ojson | jq -r .spec.clusterIP`
+
+echo "sshfs -o allow_other,default_permissions -o ssh_command=\"ssh -J $USER@$masterIP\" root@$podIP:/run/secrets/kubernetes.io/serviceaccount /var/run/secrets/kubernetes.io/serviceaccount"
+jq -r '.[] | "mkdir -p " + .mountPath + " && sshfs -o allow_other,default_permissions -o ssh_command=\"ssh -J '$USER@$masterIP'\" root@'$podIP':" + .mountPath + " " + .mountPath' <<< $volumeMounts
+echo "ssh -J $USER@$masterIP root@$podIP -L6443:$clusterIP:443 -R $containerPort:127.0.0.1:$containerPort"
+echo "sshuttle --dns -NH -e 'ssh -J $USER@$masterIP' -r root@$podIP 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16"
