@@ -18,7 +18,7 @@ containerPort=`jq -r .[].containerPort <<< $ports`
 name=$deploy-mock
 
 key=`base64 -w0 <<< $node_sshkey`
-cmd='["sh", "-c", "--", "mkdir /root/.ssh && echo '${key}' | base64 -d > /root/.ssh/authorized_keys && apt update && apt install -y openssh-server python3 && mkdir /run/sshd && echo \"GatewayPorts yes\" > /etc/ssh/sshd_config.d/0.conf && /usr/sbin/sshd -D" ]'
+cmd='["sh", "-c", "--", "mkdir /root/.ssh && echo '${key}' | base64 -d > /root/.ssh/authorized_keys && apt update && apt install -y openssh-server python3 && mkdir /run/sshd && echo \"GatewayPorts yes\" > /etc/ssh/sshd_config.d/0.conf && exec /usr/sbin/sshd -D" ]'
 overrides="$(
 cat <<EOF
 {

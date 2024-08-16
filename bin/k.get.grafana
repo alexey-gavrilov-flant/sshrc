@@ -1,1 +1,2 @@
 kubectl -n d8-monitoring get ing grafana -ojson | jq -r .spec.rules[0].host | awk '{print "echo " $1 "; dig +noall +answer " $1 }' | bash
+kubectl -n d8-monitoring get ing grafana-v10 -ojson | jq -r .spec.rules[0].host | awk '{print "echo " $1 "; dig +noall +answer " $1 }' | bash
