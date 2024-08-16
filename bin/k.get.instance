@@ -1,4 +1,5 @@
 set -x
 k get instances.deckhouse.io
+k get staticinstances.deckhouse.io
 k get staticmachine -A
 k get machine -A
