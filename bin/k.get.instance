@@ -1,1 +1,4 @@
-kubectl get instances.deckhouse.io
+set -x
+k get instances.deckhouse.io
+k get staticmachine -A
+k get machine -A

@@ -1,1 +1,4 @@
-kubectl get instances.deckhouse.io | grep -v Running
+set -x
+k get instances.deckhouse.io | grep -v Running
+k get staticmachine -A | grep -v Running
+k get machine -A | grep -v Running
