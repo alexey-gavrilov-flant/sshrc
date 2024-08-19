@@ -10,10 +10,10 @@ deploy=$2
 json=`k -n $ns get deployments.apps $deploy -ojson`
 sa=`jq -r .spec.template.spec.serviceAccount <<< $json`
 volumes=`jq -r .spec.template.spec.volumes <<< $json`
-volumeMounts=`jq -r .spec.template.spec.containers[].volumeMounts <<< $json`
+volumeMounts=`jq -r '.spec.template.spec.containers[].volumeMounts | select(. != null) | .' <<< $json`
 tolerations=`jq -r .spec.template.spec.tolerations <<< $json`
 nodeSelector=`jq -r .spec.template.spec.nodeSelector <<< $json`
-ports=`jq -r .spec.template.spec.containers[].ports <<< $json`
+ports=`jq -r '.spec.template.spec.containers[].ports | .[]' <<< $json | jq -s`
 containerPort=`jq -r .[].containerPort <<< $ports`
 name=$deploy-mock
 
