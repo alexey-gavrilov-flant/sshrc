@@ -26,15 +26,18 @@ cat > /dev/shm/cmd <<EOF
 dhctl terraform check
 dhctl config edit provider-cluster-configuration
 dhctl converge
+dhctl bootstrap
+dhctl bootstrap-phase abort --yes-i-am-sane-and-i-understand-what-i-am-doing
+dhctl destroy --yes-i-am-sane-and-i-understand-what-i-am-doing
+dhctl config render bashible-bundle --bundle-name=ubuntu-lts
+  --config=/config/config-yc.yml
+  --config=/config/config-dev-yc.yml
+  --config=/config/config-dev-static.yml
+  --ssh-agent-private-keys=~/.ssh/local --ssh-user=ubuntu
+  --ssh-agent-private-keys=~/.ssh/id_ed25519 --ssh-user=luser --ssh-host
+  --config=/config/config-dev-yc.yml
   --ask-become-pass --ssh-host
-  --ssh-agent-private-keys=~/.ssh/tfadm-id-rsa --ssh-user=ubuntu --ssh-host
-
-dhctl bootstrap --config=/config/config-yc.yml --ssh-agent-private-keys=~/.ssh/local --ssh-user=ubuntu
-dhctl bootstrap --config=/config/config-dev-yc.yml --ssh-agent-private-keys=~/.ssh/local --ssh-user=ubuntu
-dhctl bootstrap-phase abort --yes-i-am-sane-and-i-understand-what-i-am-doing --config=/config/config-dev-yc.yml
-dhctl destroy --yes-i-am-sane-and-i-understand-what-i-am-doing --ssh-agent-private-keys=~/.ssh/local --ssh-user=ubuntu --ssh-host
   --ssh-bastion-user=ubuntu --ssh-bastion-host=
-dhctl config render bashible-bundle --config=/config/config-dev-yc.yml --bundle-name=ubuntu-lts
 dhctl mirror --images-bundle-path /tmp/d8-images/d8.tar
 dhctl mirror --images-bundle-path /tmp/d8-images/d8.tar --registry="" --registry-login="" --registry-password=""
 EOF
