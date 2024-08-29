@@ -27,6 +27,7 @@ dhctl terraform check
 dhctl config edit provider-cluster-configuration
 dhctl converge
 dhctl bootstrap
+dhctl bootstrap-phase base-infra
 dhctl bootstrap-phase abort --yes-i-am-sane-and-i-understand-what-i-am-doing
 dhctl destroy --yes-i-am-sane-and-i-understand-what-i-am-doing
 dhctl config render bashible-bundle --bundle-name=ubuntu-lts
