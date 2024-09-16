@@ -6,15 +6,21 @@ if [ ! -z $2 ]; then
   if [ "$2" == "dev" ]; then
     DH_REGESTRY="dev-registry.deckhouse.io/sys"
     DH_EDITION="deckhouse-oss"
+  elif [ "$2" == "dev-cse" ]; then
+    DH_REGESTRY="dev-registry-cse.deckhouse.ru/sys"
+    DH_EDITION="deckhouse-cse"
   else
     DH_EDITION=$2;
   fi
 fi
 if [ -f $SSHHOME/.bash_secret ]; then . $SSHHOME/.bash_secret; fi
 
-ctr images pull ${DH_REGESTRY}/${DH_EDITION}/install:${DH_VERSION} --user ${DHCTL_CLI_MIRROR_SOURCE_LOGIN}:${DHCTL_CLI_MIRROR_SOURCE_PASSWORD}
+IMAGE=${DH_REGESTRY}/${DH_EDITION}/install:${DH_VERSION}
+ctr images pull ${IMAGE} --user ${DHCTL_CLI_MIRROR_SOURCE_LOGIN}:${DHCTL_CLI_MIRROR_SOURCE_PASSWORD}
 
-cat > /dev/shm/init.sh <<EOF
+mkdir -p /dev/shm/${USER}-tmp/
+
+cat > /dev/shm/${USER}-init.sh <<EOF
 #!/bin/bash
 mkdir /tmp/d8-images
 cp -r /home/user/.ssh ~/
@@ -22,7 +28,7 @@ cat /cmd
 exec bash
 EOF
 
-cat > /dev/shm/cmd <<EOF
+cat > /dev/shm/${USER}-cmd <<EOF
 dhctl terraform check
 dhctl config edit provider-cluster-configuration
 dhctl converge
@@ -43,7 +49,7 @@ dhctl mirror --images-bundle-path /tmp/d8-images/d8.tar
 dhctl mirror --images-bundle-path /tmp/d8-images/d8.tar --registry="" --registry-login="" --registry-password=""
 EOF
 
-chmod +x /dev/shm/init.sh
+chmod +x /dev/shm/${USER}-init.sh
 contaner=$(ctr c ls -q 2>/dev/null | grep dhctl-${USER})
 if [[ "${contaner}" == "dhctl-${USER}" ]]; then
   ctr task kill -s SIGKILL dhctl-${USER}
@@ -53,10 +59,11 @@ fi
 ctr run --rm -t \
   --mount type=bind,src=$PWD,dst=/config,options=rbind:ro \
   --mount type=bind,src=$HOME/.ssh/,dst=/home/user/.ssh,options=rbind:ro \
-  --mount type=bind,src=/dev/shm/init.sh,dst=/init.sh,options=rbind:ro \
-  --mount type=bind,src=/dev/shm/cmd,dst=/cmd,options=rbind:ro \
+  --mount type=bind,src=/dev/shm/${USER}-init.sh,dst=/init.sh,options=rbind:ro \
+  --mount type=bind,src=/dev/shm/${USER}-cmd,dst=/cmd,options=rbind:ro \
+  --mount type=bind,src=/dev/shm/${USER}-tmp,dst=/tmp,options=rbind:rw \
   --env-file $SSHHOME/.bash_secret \
-  --net-host ${DH_REGESTRY}/${DH_EDITION}/install:${DH_VERSION} \
+  --net-host ${IMAGE} \
   dhctl-${USER} \
   /init.sh
-rm /dev/shm/init.sh /dev/shm/cmd
+rm /dev/shm/${USER}-init.sh /dev/shm/${USER}-cmd
