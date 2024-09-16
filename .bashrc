@@ -1,5 +1,7 @@
 if [[ $CLIENT == "" ]]; then
-  CLIENT=`grep -oP "(?<=\[)[a-z-]*(?=\])" ~/.bashrc`
+  if [ -f ~/.bashrc ]; then
+    CLIENT=`grep -oP "(?<=\[)[a-z-]*(?=\])" ~/.bashrc`
+  fi
 fi
 #PS1
 SCREEN="\[\033[01;31m\][ssh]";
