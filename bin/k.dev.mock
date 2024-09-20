@@ -57,7 +57,7 @@ if [[ "${podIP}" == "" ]]; then exit 1; fi
 
 k -n "$ns" scale deployment "$deploy" --replicas 0 1>/dev/null 
 
-masterIP=`curl ip.flant.ru 2>/dev/null`
+masterIP=`d8-curl ip.flant.ru 2>/dev/null`
 clusterIP=`k get service kubernetes -ojson | jq -r .spec.clusterIP`
 
 echo "sshfs -o allow_other,default_permissions -o ssh_command=\"ssh -J $USER@$masterIP\" root@$podIP:/run/secrets/kubernetes.io/serviceaccount /var/run/secrets/kubernetes.io/serviceaccount"
