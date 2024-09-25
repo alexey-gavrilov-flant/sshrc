@@ -6,4 +6,3 @@ list=$(docker inspect $image | jq -r '.[].GraphDriver.Data.LowerDir | split(":")
 for i in $list; do
   trivy fs $i --scanners vuln
 done
-
