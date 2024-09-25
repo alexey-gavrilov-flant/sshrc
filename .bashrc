@@ -44,5 +44,5 @@ if command -v d8 &> /dev/null; then
 fi
 
 export VIMINIT="let \$MYVIMRC='$SSHHOME/.vimrc' | source \$MYVIMRC"
-export PATH=$SSHHOME:$SSHHOME/bin:$PATH:~/bin
+export PATH=$SSHHOME/bin:~/bin:$PATH
 . $SSHHOME/.bash_aliases
