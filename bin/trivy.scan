@@ -2,7 +2,7 @@ image=$1
 docker pull $image
 set -x
 trivy image $image
-list=$(docker inspect $image | jq -r '.[].GraphDriver.Data.LowerDir | split(":") | .[]')
+list=$(docker inspect $image |  jq -r '.[].GraphDriver.Data | .LowerDir + ":" + .UpperDir | split(":") | .[]')
 for i in $list; do
   trivy fs $i --scanners vuln
 done
