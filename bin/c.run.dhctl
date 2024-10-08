@@ -22,7 +22,7 @@ mkdir -p /dev/shm/${USER}-tmp/
 
 cat > /dev/shm/${USER}-init.sh <<EOF
 #!/bin/bash
-mkdir /tmp/d8-images
+mkdir -p /tmp/d8-images
 cp -r /home/user/.ssh ~/
 cat /cmd
 exec bash
@@ -47,6 +47,7 @@ dhctl config render bashible-bundle --bundle-name=ubuntu-lts
   --ssh-bastion-user=ubuntu --ssh-bastion-host=
 dhctl mirror --images-bundle-path /tmp/d8-images/d8.tar
 dhctl mirror --images-bundle-path /tmp/d8-images/d8.tar --registry="" --registry-login="" --registry-password=""
+dhctl bootstrap --config=/config/config-dev-yc.yml --ssh-agent-private-keys=~/.ssh/local --ssh-user=ubuntu
 EOF
 
 chmod +x /dev/shm/${USER}-init.sh
