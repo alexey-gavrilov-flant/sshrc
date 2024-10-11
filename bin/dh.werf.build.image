@@ -28,4 +28,12 @@ dir=$(echo "$path" | gawk -F'/' '{
     }
   }
 }')
-cd $dir && werf build --dev $images$1 --introspect-error=true && cat /tmp/.werf-build-report.json | grep DockerImageName | awk -F\" '{print "trivy.scan " $4}'
+if cd $dir && werf build --dev $images$1 --introspect-error=true; then
+  image=$(cat /tmp/.werf-build-report.json | jq -r '.Images[] | .WerfImageName + " " + .DockerImageName')
+  echo "$image" | while read -r line; do
+    echo ""
+    echo $line | awk '{print "image " $1}'
+    echo $line | awk '{print "trivy.scan " $2}'
+    echo $line | awk '{print "docker pull " $2 " && docker save " $2 " > ~/0.tar" }'
+  done
+fi
