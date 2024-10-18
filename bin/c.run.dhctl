@@ -29,6 +29,7 @@ exec bash
 EOF
 
 cat > /dev/shm/${USER}-cmd <<EOF
+dhctl bootstrap --config=/config/config-dev-yc.yml --ssh-agent-private-keys=~/.ssh/local --ssh-user=ubuntu
 dhctl terraform check
 dhctl config edit provider-cluster-configuration
 dhctl converge
