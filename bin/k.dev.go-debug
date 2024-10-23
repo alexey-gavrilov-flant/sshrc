@@ -10,7 +10,7 @@ name=$3
 container=$4
 
 key=`base64 -w0 <<< $node_sshkey`
-cmd='["sh", "-c", "--", "mkdir -p /root/.ssh /tmp/src && echo '${key}' | base64 -d > /root/.ssh/authorized_keys && apt update && apt install -y openssh-server python3 && mkdir /run/sshd && echo \"GatewayPorts yes\" > /etc/ssh/sshd_config.d/0.conf && exec /usr/sbin/sshd -D -p 23" ]'
+cmd='["sh", "-c", "--", "mkdir -p /root/.ssh /tmp/srv && chmod 0777 /tmp/srv && echo '${key}' | base64 -d > /root/.ssh/authorized_keys && apt update && apt install -y openssh-server python3 && mkdir /run/sshd && echo \"GatewayPorts yes\" > /etc/ssh/sshd_config.d/0.conf && exec /usr/sbin/sshd -D -p 23" ]'
 k -n d8-system scale deployment deckhouse --replicas 0 1>/dev/null 
 cat <<EOF | jq -c . | k -n "$ns" patch $type $name -p "$(cat)"
 {
@@ -36,5 +36,5 @@ podIP=$(k -n "$ns" get pod -l app=$name -owide | grep worker | awk '{print $6}')
 masterIP=`d8-curl ip.flant.ru 2>/dev/null`
 
 echo ""
-echo "mkdir -p /tmp/src && sshfs -o allow_other,default_permissions -o ssh_command=\"ssh -J $USER@$masterIP\" -p23 root@$podIP:/tmp/src /tmp/src"
+echo "mkdir -p /tmp/srv && sshfs -o ssh_command=\"ssh -J $USER@$masterIP\" -p23 root@$podIP:/tmp/srv /tmp/srv"
 echo "ssh -J $USER@$masterIP root@$podIP -p23 -L127.0.0.1:2345:127.0.0.1:2345"
