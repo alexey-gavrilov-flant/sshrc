@@ -1,0 +1,1 @@
+k exec -it -n d8-monitoring prometheus-main-0 -c prometheus -- promtool tsdb analyze /prometheus

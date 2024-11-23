@@ -1,1 +1,7 @@
-kubectl -n d8-system exec -ti "$(k.find.deckhouse)" -c deckhouse -- bash
+set -x
+cmd='kubectl -n d8-system exec -ti "$(k.find.deckhouse)" -c deckhouse --'
+if [[ $# -eq 0 ]]; then
+  eval "$cmd bash"
+else
+  eval "$cmd $@"
+fi
