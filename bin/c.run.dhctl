@@ -18,19 +18,22 @@ if [ -f $SSHHOME/.bash_secret ]; then . $SSHHOME/.bash_secret; fi
 IMAGE=${DH_REGESTRY}/${DH_EDITION}/install:${DH_VERSION}
 ctr images pull ${IMAGE} --user ${DHCTL_CLI_MIRROR_SOURCE_LOGIN}:${DHCTL_CLI_MIRROR_SOURCE_PASSWORD}
 
-mkdir -p /dev/shm/${USER}-tmp/
+TMPDIR=/dev/shm/${USER}-$(date '+%Y-%m-%d')-tmp/
+mkdir -p $TMPDIR
 
 cat > /dev/shm/${USER}-init.sh <<EOF
 #!/bin/bash
 mkdir -p /tmp/d8-images
 cp -r /home/user/.ssh ~/
+cat > ~/.bash_history <<EOD
+dhctl destroy --yes-i-am-sane-and-i-understand-what-i-am-doing --ssh-agent-private-keys=~/.ssh/local --ssh-user=ubuntu --ssh-host
+dhctl bootstrap --config=/config/config-dev-yc.yml --ssh-agent-private-keys=~/.ssh/local --ssh-user=ubuntu
+EOD
 cat /cmd
 exec bash
 EOF
 
 cat > /dev/shm/${USER}-cmd <<EOF
-dhctl bootstrap --config=/config/config-dev-yc.yml --ssh-agent-private-keys=~/.ssh/local --ssh-user=ubuntu
-dhctl destroy --yes-i-am-sane-and-i-understand-what-i-am-doing --ssh-agent-private-keys=~/.ssh/local --ssh-user=ubuntu --ssh-host
 dhctl terraform check
 dhctl config edit provider-cluster-configuration
 dhctl converge
@@ -64,7 +67,7 @@ ctr run --rm -t \
   --mount type=bind,src=$HOME/.ssh/,dst=/home/user/.ssh,options=rbind:ro \
   --mount type=bind,src=/dev/shm/${USER}-init.sh,dst=/init.sh,options=rbind:ro \
   --mount type=bind,src=/dev/shm/${USER}-cmd,dst=/cmd,options=rbind:ro \
-  --mount type=bind,src=/dev/shm/${USER}-tmp,dst=/tmp,options=rbind:rw \
+  --mount type=bind,src=${TMPDIR},dst=/tmp,options=rbind:rw \
   --env-file $SSHHOME/.bash_secret \
   --net-host ${IMAGE} \
   dhctl-${USER} \
