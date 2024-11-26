@@ -1,0 +1,1 @@
+k -n d8-system exec -ti "$(k.find.deckhouse)" -c deckhouse -- deckhouse-controller module render $1
