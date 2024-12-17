@@ -15,7 +15,7 @@ images=$(echo "$path" | gawk -F'/' '{
 if [[ -z "$images" ]]; then echo "image: $images"; exit 1; fi
 dir=$(echo "$path" | gawk -F'/' '{
   for(i=1; i<=NF; i++) {
-    if($i == "deckhouse") {
+    if($i == "deckhouse" || $i == "deckhouse-cse") {
       for(j=1; j<=i; j++) {
         if (j > 1) { 
           printf("/%s", $j)
