@@ -1,6 +1,8 @@
 image=$1
 docker pull $image
 set -x
+export TRIVY_DB_REPOSITORY=registry.deckhouse.ru/deckhouse/ee/security/trivy-db:2
+export TRIVY_JAVA_DB_REPOSITORY=registry.deckhouse.ru/deckhouse/ee/security/trivy-java-db:1
 trivy image $image
 if [ ! "$EUID" -ne 0 ]; then
   list=$(docker inspect $image |  jq -r '.[].GraphDriver.Data | .LowerDir + ":" + .UpperDir | split(":") | .[]')

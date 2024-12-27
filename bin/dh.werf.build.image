@@ -36,5 +36,6 @@ if cd $dir && werf build --dev $images$1 --introspect-error=true; then
     echo $line | awk '{print "image " $1}'
     echo $line | awk '{print "trivy.scan " $2}'
     echo $line | awk '{print "dive " $2}'
+    echo $line | awk '{print "docker inspect " $2}'
   done
 fi

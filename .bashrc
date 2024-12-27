@@ -46,3 +46,6 @@ fi
 export VIMINIT="let \$MYVIMRC='$SSHHOME/.vimrc' | source \$MYVIMRC"
 export PATH=$SSHHOME/bin:~/bin:$PATH
 . $SSHHOME/.bash_aliases
+if [ -f ~/.bashrc_local ]; then
+  . ~/.bashrc_local
+fi
