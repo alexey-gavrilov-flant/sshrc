@@ -3,10 +3,10 @@ docker pull $image
 set -x
 export TRIVY_DB_REPOSITORY=registry.deckhouse.ru/deckhouse/ee/security/trivy-db:2
 export TRIVY_JAVA_DB_REPOSITORY=registry.deckhouse.ru/deckhouse/ee/security/trivy-java-db:1
-trivy image $image
+trivy image $image --ignorefile ~/.trivyignore
 if [ ! "$EUID" -ne 0 ]; then
   list=$(docker inspect $image |  jq -r '.[].GraphDriver.Data | .LowerDir + ":" + .UpperDir | split(":") | .[]')
   for i in $list; do
-    trivy fs $i --scanners vuln
+    trivy fs $i --scanners vuln --ignorefile ~/.trivyignore
   done
 fi
