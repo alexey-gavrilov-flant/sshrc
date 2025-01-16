@@ -28,6 +28,8 @@ dir=$(echo "$path" | gawk -F'/' '{
     }
   }
 }')
+WERF_SAVE_BUILD_REPORT=true
+WERF_BUILD_REPORT_PATH=/tmp/.werf-build-report.json
 echo "cd $dir && werf build --dev $images$1 --introspect-error=true"
 if cd $dir && werf build --dev $images$1 --introspect-error=true; then
   image=$(cat /tmp/.werf-build-report.json | jq -r '.Images[] | .WerfImageName + " " + .DockerImageName')
