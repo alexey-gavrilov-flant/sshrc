@@ -33,7 +33,7 @@ WERF_BUILD_REPORT_PATH=/tmp/.werf-build-report.json
 echo "cd $dir && werf build --dev $images$1 --introspect-error=true"
 if cd $dir && werf build --dev $images$1 --introspect-error=true; then
   image=$(cat /tmp/.werf-build-report.json | jq -r '.Images[] | .WerfImageName + " " + .DockerImageName')
-  echo "$image" | while read -r line; do
+  echo "$image" | grep $images | while read -r line; do
     echo ""
     echo $line | awk '{print "image " $1}'
     echo $line | awk '{print "trivy.scan " $2}'
