@@ -4,9 +4,13 @@ set -x
 export TRIVY_DB_REPOSITORY=registry.deckhouse.ru/deckhouse/ee/security/trivy-db:2
 export TRIVY_JAVA_DB_REPOSITORY=registry.deckhouse.ru/deckhouse/ee/security/trivy-java-db:1
 trivy image $image --ignorefile ~/.trivyignore
-if [ ! "$EUID" -ne 0 ]; then
-  list=$(docker inspect $image |  jq -r '.[].GraphDriver.Data | .LowerDir + ":" + .UpperDir | split(":") | .[]')
-  for i in $list; do
+list=$(docker inspect $image |  jq -r '.[].GraphDriver.Data | .LowerDir + ":" + .UpperDir | split(":") | .[]')
+for i in $list; do
+  if [ "$EUID" -ne 0 ]; then
+    set -x
+    cmd=$(which trivy)
+    sudo $cmd fs $i --scanners vuln --ignorefile ~/.trivyignore
+  else
     trivy fs $i --scanners vuln --ignorefile ~/.trivyignore
-  done
-fi
+  fi
+done
