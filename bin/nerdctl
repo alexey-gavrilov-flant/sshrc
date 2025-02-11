@@ -1,0 +1,15 @@
+#!/bin/bash
+set -x
+cmd=$(find.bin nerdctl)
+if [ "$cmd" = "" ]; then
+  mkdir -p ~/bin
+  curl -L https://github.com/containerd/nerdctl/releases/download/v2.0.3/nerdctl-2.0.3-linux-amd64.tar.gz | tar -xz -C ~/bin/ nerdctl
+  cmd=$(find.bin nerdctl)
+fi
+if [ "$cmd" != "" ]; then
+  if [ "$EUID" -ne 0 ]; then
+    exec sudo $cmd "$@"
+  else
+    exec $cmd "$@"
+  fi
+fi

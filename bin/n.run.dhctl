@@ -1,0 +1,14 @@
+. $SSHHOME/bin/run.dhctl
+
+nerdctl run --rm -t \
+  --volume $PWD:/config:ro \
+  --volume $HOME/.ssh:/home/user/.ssh:ro \
+  --volume /dev/shm/${USER}-init.sh:/init.sh:ro \
+  --volume /dev/shm/${USER}-cmd:/cmd:ro \
+  --volume ${TMPDIR}:/tmp:rw \
+  --env-file $SSHHOME/.bash_secret \
+  --net=host ${IMAGE} \
+  dhctl-${USER} \
+  /init.sh
+
+#rm /dev/shm/${USER}-init.sh /dev/shm/${USER}-cmd

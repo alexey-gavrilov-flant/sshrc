@@ -1,67 +1,13 @@
-DH_VERSION=stable
-DH_EDITION=fe
-DH_REGESTRY="registry.deckhouse.io/deckhouse"
-if [ ! -z $1 ]; then DH_VERSION=$1; fi
-if [ ! -z $2 ]; then
-  if [ "$2" == "dev" ]; then
-    DH_REGESTRY="dev-registry.deckhouse.io/sys"
-    DH_EDITION="deckhouse-oss"
-  elif [ "$2" == "dev-cse" ]; then
-    DH_REGESTRY="dev-registry-cse.deckhouse.ru/sys"
-    DH_EDITION="deckhouse-cse"
-  else
-    DH_EDITION=$2;
-  fi
-fi
-if [ -f $SSHHOME/.bash_secret ]; then . $SSHHOME/.bash_secret; fi
+. $SSHHOME/bin/run.dhctl
 
-IMAGE=${DH_REGESTRY}/${DH_EDITION}/install:${DH_VERSION}
 ctr images pull ${IMAGE} --user ${DHCTL_CLI_MIRROR_SOURCE_LOGIN}:${DHCTL_CLI_MIRROR_SOURCE_PASSWORD}
 
-TMPDIR=/dev/shm/${USER}-$(date '+%Y-%m-%d')-tmp/
-mkdir -p $TMPDIR
-
-cat > /dev/shm/${USER}-init.sh <<EOF
-#!/bin/bash
-mkdir -p /tmp/d8-images
-cp -r /home/user/.ssh ~/
-cat > ~/.bash_history <<EOD
-dhctl destroy --yes-i-am-sane-and-i-understand-what-i-am-doing --ssh-agent-private-keys=~/.ssh/local --ssh-user=ubuntu --ssh-host
-dhctl bootstrap --config=/config/config-dev-yc.yml --ssh-agent-private-keys=~/.ssh/local --ssh-user=ubuntu
-EOD
-cat /cmd
-exec bash
-EOF
-
-cat > /dev/shm/${USER}-cmd <<EOF
-dhctl terraform check
-dhctl config edit provider-cluster-configuration
-dhctl converge
-dhctl bootstrap
-dhctl bootstrap-phase base-infra
-dhctl bootstrap-phase abort --yes-i-am-sane-and-i-understand-what-i-am-doing
-dhctl destroy --yes-i-am-sane-and-i-understand-what-i-am-doing
-dhctl config render bashible-bundle --bundle-name=ubuntu-lts
-  --config=/config/config-yc.yml
-  --config=/config/config-dev-yc.yml
-  --config=/config/config-dev-static.yml
-  --ssh-agent-private-keys=~/.ssh/local --ssh-user=ubuntu
-  --ssh-agent-private-keys=~/.ssh/id_ed25519 --ssh-user=luser --ssh-host
-  --config=/config/config-dev-yc.yml
-  --ask-become-pass --ssh-host
-  --ssh-bastion-user=ubuntu --ssh-bastion-host=
-dhctl mirror --images-bundle-path /tmp/d8-images/d8.tar
-dhctl mirror --images-bundle-path /tmp/d8-images/d8.tar --registry="" --registry-login="" --registry-password=""
-dhctl bootstrap --config=/config/config-dev-yc.yml --ssh-agent-private-keys=~/.ssh/local --ssh-user=ubuntu
-EOF
-
-chmod +x /dev/shm/${USER}-init.sh
 contaner=$(ctr c ls -q 2>/dev/null | grep dhctl-${USER})
 if [[ "${contaner}" == "dhctl-${USER}" ]]; then
   ctr task kill -s SIGKILL dhctl-${USER}
   ctr c rm dhctl-${USER}
 fi
-#ctr task attach dhctl
+
 ctr run --rm -t \
   --mount type=bind,src=$PWD,dst=/config,options=rbind:ro \
   --mount type=bind,src=$HOME/.ssh/,dst=/home/user/.ssh,options=rbind:ro \
@@ -72,4 +18,5 @@ ctr run --rm -t \
   --net-host ${IMAGE} \
   dhctl-${USER} \
   /init.sh
+
 rm /dev/shm/${USER}-init.sh /dev/shm/${USER}-cmd
