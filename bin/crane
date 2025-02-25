@@ -1,0 +1,10 @@
+#!/bin/bash
+cmd=$(find.bin crane)
+if [ "$cmd" = "" ]; then
+  mkdir -p ~/bin
+  curl -L  https://github.com/google/go-containerregistry/releases/download/v0.20.3/go-containerregistry_Linux_x86_64.tar.gz | tar -xz -C ~/bin/ crane
+  cmd=$(find.bin crane)
+fi
+if [ "$cmd" != "" ]; then
+  exec $cmd "$@"
+fi

@@ -1,5 +1,6 @@
 . $SSHHOME/bin/run.dhctl
 
+docker pull ${IMAGE}
 docker run --rm -it \
   --volume $PWD:/config:ro \
   --volume $HOME/.ssh:/home/user/.ssh:ro \

@@ -9,19 +9,67 @@ type=$2
 name=$3
 container=$4
 
-key=`base64 -w0 <<< $node_sshkey`
-cmd='["sh", "-c", "--", "mkdir -p /root/.ssh /tmp/srv && chmod 0777 /tmp/srv && echo '${key}' | base64 -d > /root/.ssh/authorized_keys && apt update && apt install -y openssh-server python3 && mkdir /run/sshd && echo \"GatewayPorts yes\" > /etc/ssh/sshd_config.d/0.conf && exec /usr/sbin/sshd -D -p 23" ]'
-k -n d8-system scale deployment deckhouse --replicas 0 1>/dev/null 
+if ! [[ "$ns" == "d8-system" && "$type" == "deployment" && "$name" == "deckhouse" ]]; then
+  k -n d8-system scale deployment deckhouse --replicas 0 1>/dev/null
+else
+  echo "To debug deckhouse, you need to embed the debugger directly into the image."
+  exit 1
+fi
+
+sudo apt-get install -y golang make git gcc
+mkdir -p /tmp/srv
+sudo chmod 0777 /tmp/srv
+if [ ! -f /tmp/srv/busybox/bin/sh ]; then
+  mkdir -p /tmp/srv/busybox
+  crane export busybox:stable - | tar -x -C /tmp/srv/busybox
+fi
+if [ ! -f /tmp/srv/go/bin/go ]; then
+  curl -L "https://go.dev/dl/go1.23.6.linux-amd64.tar.gz" | tar -xz -C /tmp/srv
+fi
+#if [ ! -f /tmp/srv/gcc/usr/local/bin/gcc ]; then
+#  mkdir -p /tmp/srv/gcc
+#  crane export gcc:13 - | tar -x -C /tmp/srv/gcc
+#fi
+#if [ ! -f /tmp/srv/include/usr/include/stdint.h ]; then
+#  mkdir -p /tmp/srv/include
+#  curl -L "https://le9i0nx.gitlab.io/gobuild/p11-gcc.tar.gz" | tar -xz -C /tmp/srv/include
+#fi
+sudo chown deckhouse:deckhouse -R /tmp/srv
+
+cmd='["/tmp/srv/busybox/bin/sh", "-c", "--", "while true; do sleep 5; done" ]'
+
 cat <<EOF | jq -c . | k -n "$ns" patch $type $name -p "$(cat)"
 {
   "spec": {
     "template": {
       "spec": {
+        "volumes": [
+          {
+            "hostPath": {
+              "path": "/tmp/srv",
+              "type": "DirectoryOrCreate"
+            },
+            "name": "build"
+          }
+        ],
         "containers": [
           {
             "name": "$container",
-            "image": "golang:1.23-bookworm",
-            "command": $cmd
+            "command": $cmd,
+            "volumeMounts": [
+              {
+                "mountPath": "/tmp/srv",
+                "name": "build"
+              },
+              {
+                "mountPath": "/.cache",
+                "name": "build"
+              },
+              {
+                "mountPath": "/go",
+                "name": "build"
+              }
+            ]
           }
         ]
       }
@@ -31,10 +79,11 @@ cat <<EOF | jq -c . | k -n "$ns" patch $type $name -p "$(cat)"
 EOF
 
 sleep 3
-podIP=$(k -n "$ns" get pod -l app=$name -owide | grep worker | awk '{print $6}')
+podIP=$(k -n "$ns" get pod -l app=$name -ojson | jq -r '.items[].status.podIP')
 
 masterIP=`d8-curl ip.flant.ru 2>/dev/null`
 
 echo ""
-echo "mkdir -p /tmp/srv && sshfs -o ssh_command=\"ssh -J $USER@$masterIP\" -p23 root@$podIP:/tmp/srv /tmp/srv"
-echo "ssh -J $USER@$masterIP root@$podIP -p23 -L127.0.0.1:2345:127.0.0.1:2345"
+#echo "mkdir -p /tmp/srv && sshfs -o ssh_command=\"ssh -J $USER@$masterIP\" -p10023 root@$podIP:/tmp/srv /tmp/srv"
+echo "mkdir -p /tmp/srv && sshfs $USER@$masterIP:/tmp/srv /tmp/srv"
+echo "ssh $USER@$masterIP -L127.0.0.1:2345:127.0.0.1:2345"
