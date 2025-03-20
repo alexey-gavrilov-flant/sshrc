@@ -1,0 +1,8 @@
+CURRENT_IMAGE=$(kubectl get deployment deckhouse -n d8-system -o jsonpath='{.spec.template.spec.containers[0].image}')
+IMAGE_NAME=$(echo "$CURRENT_IMAGE" | sed 's/:[^:]*$//')
+NEW_IMAGE="${IMAGE_NAME}:main"
+
+kubectl patch deployment deckhouse -n d8-system --type='json' -p='[
+  {"op": "replace", "path": "/spec/template/spec/containers/0/image", "value": "'"$NEW_IMAGE"'"},
+  {"op": "remove", "path": "/spec/template/spec/initContainers"}
+]'
