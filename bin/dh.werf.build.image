@@ -1,33 +1,49 @@
 path=$(pwd)
-if ! [[ "$path" =~ "deckhouse" && "$path" =~ "images" ]]; then echo "no path images"; exit 1; fi
-images=$(echo "$path" | gawk -F'/' '{
-  for(i=1; i<=NF; i++) {
-    if($i == "images") {
-      before = gensub(/^[0-9]+-/, "", "g", $(i-1))
-      after = $(i+1)
-      break
+if [[ "$path" =~ "deckhouse" && "$path" =~ "images" ]]; then
+  images=$(echo "$path" | gawk -F'/' '{
+    for(i=1; i<=NF; i++) {
+      if($i == "images") {
+        before = gensub(/^[0-9]+-/, "", "g", $(i-1))
+        after = $(i+1)
+        break
+      }
     }
-  }
-  if (before != "" && after != "") {
-    print before "/" after
-  }
-}')
-if [[ -z "$images" ]]; then echo "image: $images"; exit 1; fi
-dir=$(echo "$path" | gawk -F'/' '{
-  for(i=1; i<=NF; i++) {
-    if($i == "deckhouse" || $i == "deckhouse-cse") {
-      for(j=1; j<=i; j++) {
-        if (j > 1) { 
-          printf("/%s", $j)
-        } else {
-          printf("%s", $j)
+    if (before != "" && after != "") {
+      print before "/" after
+    }
+  }')
+  if [[ -z "$images" ]]; then echo "image: $images"; exit 1; fi
+  dir=$(echo "$path" | gawk -F'/' '{
+    for(i=1; i<=NF; i++) {
+      if($i == "deckhouse" || $i == "deckhouse-cse") {
+        for(j=1; j<=i; j++) {
+          if (j > 1) {
+            printf("/%s", $j)
+          } else {
+            printf("%s", $j)
+          }
+        }
+        printf("\n")
+        break
+      }
+    }
+  }')
+else
+  if [[ "$path" =~ "images" ]]; then
+    images=$(echo "$path" | gawk -F'/' '{
+      for(i=1; i<=NF; i++) {
+        if($i == "images") {
+          after = $(i+1)
+          break
         }
       }
-      printf("\n")
-      break
-    }
-  }
-}')
+      if (after != "") {
+        print after
+      }
+    }')
+    dir=../../
+  fi
+fi
 export WERF_SAVE_BUILD_REPORT=true
 export WERF_BUILD_REPORT_PATH=/tmp/.werf-build-report.json
 echo "cd $dir && werf build --dev $images$1 --introspect-error=true"
