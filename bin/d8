@@ -1,0 +1,13 @@
+#!/bin/bash
+cmd=$(find.bin d8)
+if [ "$cmd" != "" ]; then
+  if [ -f ~/.kube/config ]; then
+    exec $cmd "$@"
+  else
+    if [ "$EUID" -ne 0 ]; then
+      exec sudo $cmd "$@"
+    else
+      exec $cmd "$@"
+    fi
+  fi
+fi

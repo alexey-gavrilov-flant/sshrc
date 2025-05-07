@@ -1,5 +1,5 @@
 param=""
-if [ -f  ~/.trivyignore ]; then
+if [ -f ~/.trivyignore ]; then
   param=" --ignorefile ~/.trivyignore"
 fi
 
