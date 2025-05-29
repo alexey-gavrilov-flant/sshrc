@@ -1,6 +1,14 @@
-cmd='kubectl -n d8-system exec -ti "$(k.find.deckhouse)" -c deckhouse --'
-if [[ $# -eq 0 ]]; then
-  eval "$cmd bash"
+#!/bin/bash
+pods="$(k.find.deckhouse)"
+if [[ ! "$pods" =~ [[:space:]] ]]; then
+  cmd='kubectl -n d8-system exec -ti "${pods}" -c deckhouse --'
+  if [[ $# -eq 0 ]]; then
+    eval "$cmd bash"
+  else
+    eval "$cmd $@"
+  fi
 else
-  eval "$cmd $@"
+  for pod in ${pods}; do
+    echo "kubectl -n d8-system exec -ti "${pod}" -c deckhouse -- $@"
+  done
 fi

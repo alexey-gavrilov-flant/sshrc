@@ -1,6 +1,6 @@
-count=$(kubectl -n d8-system get pods --no-headers -l app=deckhouse | wc -l)
+count=$(k -n d8-system get pod --no-headers -l app=deckhouse,leader=true | wc -l)
 if [ "1" == "$count" ]; then
-  echo "$(kubectl -n d8-system get pods --no-headers -l app=deckhouse | awk '{print $1}')"
+  echo "$(k -n d8-system get pod -l app=deckhouse,leader=true -ojsonpath='{.items[*].metadata.name}')"
 else
-  echo "svc/deckhouse-leader"
+  echo "$(k -n d8-system get pod -l app=deckhouse -ojsonpath='{.items[*].metadata.name}')"
 fi
