@@ -23,7 +23,7 @@ if [[ "${comm}" == "sshd" || "${comm}" == "containerd-shim" || "${comm}" == "scr
   fi
 fi
 
-export PATH=/opt/deckhouse/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+export PATH=~/bin:/opt/deckhouse/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
   . /etc/bash_completion
 else
@@ -44,7 +44,7 @@ if command -v d8 &> /dev/null; then
 fi
 
 export VIMINIT="let \$MYVIMRC='$SSHHOME/.vimrc' | source \$MYVIMRC"
-export PATH=$SSHHOME/bin:~/bin:$PATH
+export PATH=$SSHHOME/bin:$PATH
 . $SSHHOME/.bash_aliases
 if [ -f ~/.bashrc_local ]; then
   . ~/.bashrc_local
