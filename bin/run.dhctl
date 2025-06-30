@@ -1,21 +1,24 @@
 DH_VERSION=stable
-DH_EDITION=fe
+DH_EDITION="/fe"
 DH_REGESTRY="registry.deckhouse.io/deckhouse"
 if [ ! -z $1 ]; then DH_VERSION=$1; fi
 if [ ! -z $2 ]; then
   if [ "$2" == "dev" ]; then
     DH_REGESTRY="dev-registry.deckhouse.io/sys"
-    DH_EDITION="deckhouse-oss"
+    DH_EDITION="/deckhouse-oss"
   elif [ "$2" == "dev-cse" ]; then
     DH_REGESTRY="dev-registry-cse.deckhouse.ru/sys"
-    DH_EDITION="deckhouse-cse"
+    DH_EDITION="/deckhouse-cse"
+  elif [ ${#2} -gt 3 ]; then
+    DH_REGESTRY="$2"
+    DH_EDITION=""
   else
-    DH_EDITION=$2;
+    DH_EDITION=/$2;
   fi
 fi
 if [ -f $SSHHOME/.bash_secret ]; then . $SSHHOME/.bash_secret; fi
 
-IMAGE=${DH_REGESTRY}/${DH_EDITION}/install:${DH_VERSION}
+IMAGE=${DH_REGESTRY}${DH_EDITION}/install:${DH_VERSION}
 TMPDIR=/dev/shm/${USER}-$(date '+%Y-%m-%d')-tmp/
 mkdir -p $TMPDIR
 
