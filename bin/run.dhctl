@@ -9,6 +9,9 @@ if [ ! -z $2 ]; then
   elif [ "$2" == "dev-cse" ]; then
     DH_REGESTRY="dev-registry-cse.deckhouse.ru/sys"
     DH_EDITION="/deckhouse-cse"
+  elif [ "$2" == "cse" ]; then
+    DH_REGESTRY="registry-cse.deckhouse.ru/deckhouse"
+    DH_EDITION="/cse"
   elif [ ${#2} -gt 3 ]; then
     DH_REGESTRY="$2"
     DH_EDITION=""
