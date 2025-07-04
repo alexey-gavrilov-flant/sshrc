@@ -1,0 +1,11 @@
+#!/bin/bash
+cmd=$(find.bin crane)
+if [ "$cmd" = "" ]; then
+  mkdir -p ~/bin
+  curl -L https://github.com/regclient/regclient/releases/download/v0.9.0/regctl-linux-amd64 > ~/bin/regctl
+  chmod +x ~/bin/regctl
+  cmd=$(find.bin regctl)
+fi
+if [ "$cmd" != "" ]; then
+  exec $cmd "$@"
+fi
