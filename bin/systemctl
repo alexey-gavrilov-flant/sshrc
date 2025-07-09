@@ -1,0 +1,8 @@
+#!/bin/bash
+cmd=$(find.bin systemctl)
+if [ "$cmd" != "" ]; then
+  if [ "$1" == "status" ]; then
+    add="--no-pager -l"
+  fi
+  exec $cmd "$@" $add
+fi
