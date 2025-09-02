@@ -1,1 +1,1 @@
-kubectl -n d8-system logs "$(k.find.deckhouse)" --tail=100 -f | jq -r 'select(.module != null) | .color |= (if .level == "error" then 1 else 4 end) | "\(.time) \u001B[1;3\(.color)m[\(.level)]\u001B[0m\u001B[1;35m[\(.module)]\u001B[0m - \u001B[1;33m\(.msg)\u001B[0m"'
+kubectl -n d8-system logs "$(k.find.deckhouse)" --tail=100 -f
