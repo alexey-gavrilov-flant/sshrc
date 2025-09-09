@@ -24,7 +24,7 @@ if [ ! -f /tmp/srv/busybox/bin/sh ]; then
   crane export busybox:stable - | tar -x -C /tmp/srv/busybox
 fi
 if [ ! -f /tmp/srv/go/bin/go ]; then
-  curl -L "https://go.dev/dl/go1.23.6.linux-amd64.tar.gz" | tar -xz -C /tmp/srv
+  curl --socks5-hostname 127.0.0.1 -L "https://go.dev/dl/go1.23.6.linux-amd64.tar.gz" | tar -xz -C /tmp/srv
 fi
 #if [ ! -f /tmp/srv/gcc/usr/local/bin/gcc ]; then
 #  mkdir -p /tmp/srv/gcc

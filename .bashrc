@@ -26,21 +26,29 @@ fi
 export PATH=~/bin:/opt/deckhouse/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
   . /etc/bash_completion
-else
-  if [ -f /usr/share/bash-completion/bash_completion ] && ! shopt -oq posix; then
+elif [ -f /usr/share/bash-completion/bash_completion ] && ! shopt -oq posix; then
     . /usr/share/bash-completion/bash_completion
+else
+  if [ ! -f ~/bash_completion ]; then
+    ver=2.16.0
+    curl --socks5-hostname 127.0.0.1 -L https://raw.githubusercontent.com/scop/bash-completion/$ver/bash_completion -o ~/bash_completion 2>/dev/null
+    mkdir -p ~/bash_completion.d
+    curl --socks5-hostname 127.0.0.1 -L https://raw.githubusercontent.com/scop/bash-completion/$ver/bash_completion.d/000_bash_completion_compat.bash -o ~/bash_completion.d/000_bash_completion_compat.bash 2>/dev/null
   fi
+  if [ -f ~/bash_completion ] && ! shopt -oq posix; then . ~/bash_completion; fi
 fi
-if command -v kubectl &> /dev/null; then
-  if [ ! -d ~/.kube ]; then mkdir ~/.kube; fi
-  if [ ! -f ~/.kube/completion.bash.inc ]; then kubectl completion bash > ~/.kube/completion.bash.inc; fi
-  if [ -f ~/.kube/completion.bash.inc ]; then
-    . ~/.kube/completion.bash.inc
-    complete -o default -F __start_kubectl k
+if [ "$(type -t _get_comp_words_by_ref)" = "function" ]; then
+  if command -v kubectl &> /dev/null; then
+    if [ ! -d ~/.kube ]; then mkdir ~/.kube; fi
+    if [ ! -f ~/.kube/completion.bash.inc ]; then kubectl completion bash > ~/.kube/completion.bash.inc; fi
+    if [ -f ~/.kube/completion.bash.inc ]; then
+      . ~/.kube/completion.bash.inc
+      complete -o default -F __start_kubectl k
+    fi
   fi
-fi
-if command -v d8 &> /dev/null; then
-  source <(d8 completion bash)
+  if command -v d8 &> /dev/null; then
+    source <(d8 completion bash)
+  fi
 fi
 
 export VIMINIT="let \$MYVIMRC='$SSHHOME/.vimrc' | source \$MYVIMRC"
