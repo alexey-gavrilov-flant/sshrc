@@ -4,11 +4,16 @@ local SSHHOME=${SSHHOME:=~/flant/sshrc}
 local files=`ls -A $SSHHOME | grep -v -E "^(.git|README|LICENSE)"`
 SIZE=$(tar cfz - -h -C $SSHHOME $files | wc -c)
 if [ ${SIZE} -gt 65536 ]; then echo >&2 $'files must be less than 64kb\ncurrent size: '$SIZE' bytes'; exit 1; fi
-ssh -t "$DOMAIN" $SSHARGS -R 1080 "
+min=1024
+max=64000
+rand=$(( (RANDOM << 15) | RANDOM ))
+PROXY_PORT=$(( rand % (max - min + 1) + min ))
+ssh -t "$DOMAIN" $SSHARGS -R $PROXY_PORT "
 command -v base64 >/dev/null 2>&1 || { echo >&2 \"sshrc requires base64\"; exit 1; }
 export SSHHOME=\$(mktemp -d /dev/shm/.$(whoami).sshrc.XXXX)
 export SSHRCCLEANUP=\$SSHHOME
 export SSTAR=$(tar cfz - -h -C $SSHHOME $files | base64 -w0)
+export PROXY_PORT=$PROXY_PORT
 
 echo \$SSTAR | base64 -d | tar mxzf - -C \$SSHHOME
 export CLIENT=`echo $DOMAIN | grep -Po '^(?!.*@)([^.]+)'`

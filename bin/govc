@@ -2,7 +2,7 @@
 
 if [ ! -f ~/bin/govc.bin ]; then
   mkdir -p ~/bin/
-  curl --socks5-hostname 127.0.0.1 -L -o - "https://github.com/vmware/govmomi/releases/latest/download/govc_$(uname -s)_$(uname -m).tar.gz" | tar -C ~/bin -xvzf - govc
+  curl --socks5-hostname 127.0.0.1:$PROXY_PORT -L -o - "https://github.com/vmware/govmomi/releases/latest/download/govc_$(uname -s)_$(uname -m).tar.gz" | tar -C ~/bin -xvzf - govc
 fi
 CONFIG=$(k.dhctl.get.provider-cluster-configuration 2>/dev/null)
 if [ ! -z "${CONFIG}" ]; then

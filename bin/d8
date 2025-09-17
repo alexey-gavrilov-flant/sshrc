@@ -2,7 +2,7 @@
 cmd=$(find.bin d8)
 if [ "$cmd" = "" ]; then
   mkdir -p ~/bin
-  curl --socks5-hostname 127.0.0.1 -L https://github.com/deckhouse/deckhouse-cli/releases/download/v0.13.2/d8-v0.13.2-linux-amd64.tar.gz | tar -xz -C ~/bin/ --strip-components=2 linux-amd64/bin/d8
+  curl --socks5-hostname 127.0.0.1:$PROXY_PORT -L https://github.com/deckhouse/deckhouse-cli/releases/download/v0.13.2/d8-v0.13.2-linux-amd64.tar.gz | tar -xz -C ~/bin/ --strip-components=2 linux-amd64/bin/d8
   cmd=$(find.bin d8)
 fi
 if [ "$cmd" != "" ]; then

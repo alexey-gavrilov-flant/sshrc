@@ -40,11 +40,13 @@ fi
 if [ "$(type -t _get_comp_words_by_ref)" = "function" ]; then
   if command -v kubectl &> /dev/null; then
     if [ ! -d ~/.kube ]; then mkdir ~/.kube; fi
-    if [ ! -f ~/.kube/completion.bash.inc ]; then kubectl completion bash > ~/.kube/completion.bash.inc; fi
-    if [ -f ~/.kube/completion.bash.inc ]; then
-      . ~/.kube/completion.bash.inc
+    if [ ! -f ~/.kube/kubectl.completion.bash.inc ]; then kubectl completion bash > ~/.kube/kubectl.completion.bash.inc; fi
+    if [ ! -f ~/.kube/crictl.completion.bash.inc ]; then crictl completion bash > ~/.kube/crictl.completion.bash.inc; fi
+    if [ -f ~/.kube/kubectl.completion.bash.inc ]; then
+      . ~/.kube/kubectl.completion.bash.inc
       complete -o default -F __start_kubectl k
     fi
+    if [ -f ~/.kube/crictl.completion.bash.inc ]; then . ~/.kube/crictl.completion.bash.inc; fi
   fi
   if command -v d8 &> /dev/null; then
     source <(d8 completion bash)

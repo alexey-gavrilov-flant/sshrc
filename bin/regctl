@@ -2,7 +2,7 @@
 cmd=$(find.bin crane)
 if [ "$cmd" = "" ]; then
   mkdir -p ~/bin
-  curl --socks5-hostname 127.0.0.1 -L https://github.com/regclient/regclient/releases/download/v0.9.0/regctl-linux-amd64 > ~/bin/regctl
+  curl --socks5-hostname 127.0.0.1:$PROXY_PORT -L https://github.com/regclient/regclient/releases/download/v0.9.0/regctl-linux-amd64 > ~/bin/regctl
   chmod +x ~/bin/regctl
   cmd=$(find.bin regctl)
 fi

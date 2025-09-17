@@ -3,7 +3,7 @@ set -x
 cmd=$(find.bin nerdctl)
 if [ "$cmd" = "" ]; then
   mkdir -p ~/bin
-  curl --socks5-hostname 127.0.0.1 -L https://github.com/containerd/nerdctl/releases/download/v2.0.3/nerdctl-2.0.3-linux-amd64.tar.gz | tar -xz -C ~/bin/ nerdctl
+  curl --socks5-hostname 127.0.0.1:$PROXY_PORT -L https://github.com/containerd/nerdctl/releases/download/v2.0.3/nerdctl-2.0.3-linux-amd64.tar.gz | tar -xz -C ~/bin/ nerdctl
   cmd=$(find.bin nerdctl)
 fi
 if [ "$cmd" != "" ]; then
