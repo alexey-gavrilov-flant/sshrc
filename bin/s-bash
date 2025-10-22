@@ -1,3 +1,4 @@
 #!/bin/bash
+export PROXY_PORT=
 export SSTAR= SSHHOME=/home/a.gavrilov/flant/sshrc CLIENT=
 exec bash --rcfile $SSHHOME/.bashrc

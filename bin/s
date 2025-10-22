@@ -1,5 +1,6 @@
 cat > $SSHHOME/bin/s-bash <<EOF
 #!/bin/bash
+export PROXY_PORT=$PROXY_PORT
 export SSTAR=$SSTAR SSHHOME=$SSHHOME CLIENT=$CLIENT
 exec bash --rcfile \$SSHHOME/.bashrc
 EOF

@@ -1,1 +1,1 @@
-cat - | grep -v "^NAMESPACE" | awk '{ print "k delete pod -n " $1 " "  $2 " &"}' | bash
+cat - | grep -v "^NAMESPACE" | awk '{ print "k delete pod -n " $1 " "  $2 " "}' | bash

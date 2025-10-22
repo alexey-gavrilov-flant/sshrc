@@ -1,0 +1,11 @@
+#!/bin/bash
+cmd=$(find.bin ncdu)
+if [ "$cmd" = "" ]; then
+  mkdir -p ~/bin
+  if [ -n "$PROXY_PORT" ]; then proxy="--socks5-hostname 127.0.0.1:$PROXY_PORT"; fi
+  curl $proxy -L "https://dev.yorhel.nl/download/ncdu-2.9.1-linux-x86_64.tar.gz" | tar -xz -C ~/bin/ ncdu
+  cmd=$(find.bin ncdu)
+fi
+if [ "$cmd" != "" ]; then
+  exec $cmd "$@"
+fi
