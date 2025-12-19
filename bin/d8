@@ -3,7 +3,7 @@ cmd=$(find.bin d8)
 if [ "$cmd" = "" ]; then
   mkdir -p ~/bin
   if [ -n "$PROXY_PORT" ]; then proxy="--socks5-hostname 127.0.0.1:$PROXY_PORT"; fi
-  curl $proxy -L "https://github.com/deckhouse/deckhouse-cli/releases/download/v0.20.3/d8-v0.20.3-linux-amd64.tar.gz" | tar -xz -C ~/bin/ --strip-components=2 linux-amd64/bin/d8
+  curl $proxy -L "https://github.com/deckhouse/deckhouse-cli/releases/download/v0.25.1/d8-v0.25.1-linux-amd64.tar.gz" | tar -xz -C ~/bin/ --strip-components=2 linux-amd64/bin/d8
   cmd=$(find.bin d8)
 fi
 if [ "$cmd" != "" ]; then
