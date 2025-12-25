@@ -1,5 +1,5 @@
 #!/bin/bash
 for pod in $(k.find.deckhouse); do
-  echo "${pod}"
+  kubectl -n d8-system get pod "${pod}" -owide --no-headers=true
   kubectl -n d8-system exec -it "${pod}" -c deckhouse -- deckhouse-controller queue list "$@"
 done
