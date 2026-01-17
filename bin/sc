@@ -6,5 +6,10 @@ if [[ "${comm}" == "screen" ]]; then
   echo $SSTAR | base64 -d | tar mxzf - -C $SSHHOME
   exec bash --rcfile $SSHHOME/.bashrc
 else
+  if ! [ -d ~/.screen ]; then
+    mkdir ~/.screen
+    chmod 700 ~/.screen
+  fi
+  export SCREENDIR=$HOME/.screen
   screen -c $SSHHOME/.screenrc -SRR con $SSHHOME/bin/sc
 fi
