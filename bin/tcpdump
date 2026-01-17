@@ -1,0 +1,12 @@
+#!/bin/bash
+cmd=$(find.bin tcpdump)
+if [ "$cmd" = "" ]; then
+  mkdir -p ~/bin
+  if [ -n "$PROXY_PORT" ]; then proxy="--socks5-hostname 127.0.0.1:$PROXY_PORT"; fi
+  curl $proxy -L "http://127.0.0.1:81/tcpdump" > ~/bin/tcpdump
+  chmod +x ~/bin/tcpdump
+  cmd=$(find.bin tcpdump)
+fi
+if [ "$cmd" != "" ]; then
+  exec $cmd "$@"
+fi
