@@ -1,0 +1,10 @@
+#!/bin/bash
+comm=$(cat /proc/$(ps -o ppid:1= -p $$)/comm)
+if [[ "${comm}" == "atch" ]]; then
+  export SSHHOME=$(mktemp -d -p /dev/shm/ -t .$(whoami).sshrc.XXXX)
+  export SSHRCCLEANUP=$SSHHOME
+  echo $SSTAR | base64 -d | tar mxzf - -C $SSHHOME
+  exec bash --rcfile $SSHHOME/.bashrc
+else
+  atch con $SSHHOME/bin/ac
+fi
