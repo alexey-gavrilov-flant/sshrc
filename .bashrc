@@ -23,8 +23,11 @@ if [[ "${comm}" == "sshd" || "${comm}" == "containerd-shim" || "${comm}" == "scr
     trap "rm -rf $SSHRCCLEANUP; exit" 0
   fi
 fi
-
-export PATH=~/bin:/opt/deckhouse/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+if [ -n "$ANDROID_ROOT" ]; then
+  export PATH=~/bin:$PATH
+else
+  export PATH=~/bin:/opt/deckhouse/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+fi
 if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
   . /etc/bash_completion
 elif [ -f /usr/share/bash-completion/bash_completion ] && ! shopt -oq posix; then

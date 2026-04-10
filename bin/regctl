@@ -1,8 +1,9 @@
 #!/bin/bash
-cmd=$(find.bin crane)
+cmd=$(find.bin regctl)
 if [ "$cmd" = "" ]; then
   mkdir -p ~/bin
-  curl --socks5-hostname 127.0.0.1:$PROXY_PORT -L https://github.com/regclient/regclient/releases/download/v0.9.0/regctl-linux-amd64 > ~/bin/regctl
+  if [ -n "$PROXY_PORT" ]; then proxy="--socks5-hostname 127.0.0.1:$PROXY_PORT"; fi
+  curl $proxy -L https://github.com/regclient/regclient/releases/download/v0.11.2/regctl-linux-amd64 > ~/bin/regctl
   chmod +x ~/bin/regctl
   cmd=$(find.bin regctl)
 fi

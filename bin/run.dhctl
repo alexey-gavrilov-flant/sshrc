@@ -33,6 +33,7 @@ cat > ~/.bash_history <<EOD
 dhctl destroy --yes-i-am-sane-and-i-understand-what-i-am-doing --ssh-agent-private-keys=~/.ssh/local --ssh-user=ubuntu --ssh-host
 dhctl bootstrap --config=/config/config-dev-yc.yml --ssh-agent-private-keys=~/.ssh/local --ssh-user=ubuntu
 dhctl bootstrap --config=/config/config-dev-cse-static.yml --ssh-agent-private-keys=~/.ssh/local --ssh-user=luser --ssh-host=
+dhctl bootstrap --config=/config/yc/caps1.yaml --config=/config/yc/config.yml --config=/config/yc/global.yaml --config=/config/yc/resources.yml --ssh-agent-private-keys=~/.ssh/local --ssh-user=luser --ssh-host=
 EOD
 cat /cmd
 exec bash

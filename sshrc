@@ -10,7 +10,8 @@ rand=$(( (RANDOM << 15) | RANDOM ))
 PROXY_PORT=$(( rand % (max - min + 1) + min ))
 ssh -t "$DOMAIN" $SSHARGS -R $PROXY_PORT "
 command -v base64 >/dev/null 2>&1 || { echo >&2 \"sshrc requires base64\"; exit 1; }
-export SSHHOME=\$(mktemp -d /dev/shm/.$(whoami).sshrc.XXXX)
+if [ -d /dev/shm ]; then BASEDIR=/dev/shm; else BASEDIR=\$HOME; fi 
+export SSHHOME=\$(mktemp -d \${BASEDIR}/.$(whoami).sshrc.XXXX)
 export SSHRCCLEANUP=\$SSHHOME
 export SSTAR=$(tar cfz - -h -C $SSHHOME $files | base64 -w0)
 export PROXY_PORT=$PROXY_PORT

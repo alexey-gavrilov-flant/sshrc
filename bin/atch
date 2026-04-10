@@ -2,7 +2,7 @@
 cmd=$(find.bin atch)
 if [ "$cmd" = "" ]; then
   mkdir -p ~/bin
-  curl --socks5-hostname 127.0.0.1:$PROXY_PORT -L https://github.com/mobydeck/atch/releases/download/0.3/atch-linux-amd64.tgz | tar -xz -C ~/bin/ atch
+  curl --socks5-hostname 127.0.0.1:$PROXY_PORT -L https://github.com/mobydeck/atch/releases/download/0.4/atch-linux-amd64.tgz | tar -xz -C ~/bin/ atch
   cmd=$(find.bin atch)
 fi
 if [ "$cmd" != "" ]; then

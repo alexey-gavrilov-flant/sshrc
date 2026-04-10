@@ -2,7 +2,8 @@
 cmd=$(find.bin crane)
 if [ "$cmd" = "" ]; then
   mkdir -p ~/bin
-  curl --socks5-hostname 127.0.0.1:$PROXY_PORT -L  https://github.com/google/go-containerregistry/releases/download/v0.20.7/go-containerregistry_Linux_x86_64.tar.gz | tar -xz -C ~/bin/ crane
+  if [ -n "$PROXY_PORT" ]; then proxy="--socks5-hostname 127.0.0.1:$PROXY_PORT"; fi
+  curl $proxy -L  https://github.com/google/go-containerregistry/releases/download/v0.20.7/go-containerregistry_Linux_x86_64.tar.gz | tar -xz -C ~/bin/ crane
   cmd=$(find.bin crane)
 fi
 if [ "$cmd" != "" ]; then
